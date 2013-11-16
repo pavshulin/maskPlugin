@@ -10,6 +10,7 @@
                 charTest: [],
                 lastEnteredPosition: 0,
                 firstNonMaskedPosition: 0,
+                editing: true,
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 maskAnalyse: maskAnalyse,
@@ -18,28 +19,24 @@
                 _onMouseUpHandler: _onMouseUpHandler,
                 _onButtonHandler: _onButtonHandler,
                 replaceOne: replaceOne,
+                checkFalsePosition: checkFalsePosition,
                 checkPosition: checkPosition,
                 addPlaces: addPlaces,
                 _onChange: _onChange,
-                editing: true,
+                _onFocus: _onFocus,
                 cutOff: cutOff,
                 destroy: destroy
             };
         };
 
     function maskAnalyse (mask, placeholder) {
-        var holder,
-            firstFlag = true;
+        var holder;
         this.placeholders = $.map(mask.split(''), function (char) {
+
             if (this.defs[char]) {
                 this.charTest.push(new RegExp(this.defs[char]));
                 holder = placeholder;
-                firstFlag = false;
             } else {
-                if (firstFlag) {
-                    this.firstNonMaskedPosition++;
-                    this.lastEnteredPosition++;
-                }
                 this.charTest.push(false);
                 holder = char;
             }
@@ -48,9 +45,9 @@
         }.bind(this));
     };
 
-    function checkPosition (caret) {
+    function checkFalsePosition (caret) {
         return (this.newText[caret] !== undefined && !this.charTest[caret])
-            ? this.checkPosition (++caret) : caret;
+            ? this.checkFalsePosition (++caret) : caret;
     };
 
     function checkOne (char, index) {
@@ -109,11 +106,37 @@
 
     function _onMouseUpHandler (e) {
         var caret = this.getCaretPosition();
-        this.setCaretPosition(this.lastEnteredPosition);
+
+        this.setCaretPosition(caret);
     };
 
+    function checkPosition (caret) {
+        var i = this.size - 1,
+            result;
+
+        for (i; i > 0; i--) {
+            if (this.charTest[i] && this.newText[i] !== this.placeholders[i]) break;
+        }
+        result = this.checkFalsePosition(i + 1);
+
+        return  caret > result ? caret : result;
+
+    }
+
+    function _onFocus () {
+
+    }
+
     function _onButtonHandler (e) {
-        console.log('button up', e.which);
+        var caret = this.getCaretPosition().end || 0,
+            button = e.which;
+
+        if (button === 39 || button === 40) {
+            caret = this.checkPosition(caret);
+            this.setCaretPosition(caret);
+        }
+
+        return true;
     };
 
     function _onChange () {
@@ -130,8 +153,8 @@
         this.cutOff();
 
         this.writeDown();
+
         caret = this.checkPosition(caret);
-        this.lastEnteredPosition = caret;
         this.setCaretPosition(caret);
     };
 
@@ -151,9 +174,12 @@
         this.maskAnalyse(mask, options.placeholder);
 
         $(this.$el).on('input', this._onChange.bind(this));
-        $(this.$el).on('focus', this._onChange.bind(this));
+        $(this.$el).on('focus', this._onFocus.bind(this));
         $(this.$el).on('mouseup', this._onMouseUpHandler.bind(this));
         $(this.$el).on('keyup', this._onButtonHandler.bind(this));
+
+        this._onChange();
+
         return this;
     };
 
