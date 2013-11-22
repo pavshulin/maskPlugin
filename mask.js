@@ -117,9 +117,10 @@
         for (i; i > 0; i--) {
             if (this.charTest[i] && this.newText[i] !== this.placeholders[i]) break;
         }
+
         result = this.checkFalsePosition(i + 1);
 
-        return  caret > result ? caret : result;
+        return  caret < result ? caret : result;
 
     }
 
