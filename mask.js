@@ -46,8 +46,8 @@
     };
 
     function checkFalsePosition (caret) {
-        return (this.newText[caret] !== undefined && !this.charTest[caret])
-            ? this.checkFalsePosition (++caret) : caret;
+        return (caret < this.size && !this.charTest[caret])
+            ? this.checkFalsePosition(++caret) : caret;
     };
 
     function checkOne (char, index) {
@@ -111,16 +111,15 @@
     };
 
     function checkPosition (caret) {
-        var i = this.size - 1,
+        var i = 0,
             result;
 
-        for (i; i > 0; i--) {
-            if (this.charTest[i] && this.newText[i] !== this.placeholders[i]) break;
+        for (i; i < this.size - 1; i++) {
+            if (this.charTest[i] && this.newText[i] === this.placeholders[i]) break;
         }
 
-        result = this.checkFalsePosition(i + 1);
-
-        return  caret < result ? caret : result;
+        result = this.checkFalsePosition(i);
+        return  result;
 
     }
 
