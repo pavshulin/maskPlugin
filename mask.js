@@ -22,7 +22,6 @@
                 checkOne: checkOne,
                 writeDown: writeDown,
                 clearUp: clearUp,
-                _onMouseUpHandler: _onMouseUpHandler,
                 _onButtonHandler: _onButtonHandler,
                 _onChange: _onChange,
                 addText: addText,
@@ -88,14 +87,6 @@
         this.$el.val('');
     };
 
-    function _onMouseDownHandler (e) {
-
-    };
-
-    function _onMouseUpHandler (e) {
-
-    };
-
     function _onFocus () {
         var caret = this.getCaretPosition().end || this.firstNonMaskedPosition;
 
@@ -149,24 +140,27 @@
         }
     };
 
-    function removeText (start, end, diff) {
-        var method = start === end ? 'one' : 'many',
-            z, i, pos;
-        if (method === 'one') {
+    function removeText (start, end, diff, text) {
+        var z, i, pos, check;
+
+        if (start === end) {
             i = start - 1;
             z = start;
-            pos = i;
-        }
-
-        if (method === 'many') {
+        } else {
             i = start;
             z = end;
-            pos = i;
+            check = z - i + diff;
         }
 
-        console.log(this.actualText.slice(i, z));
+        pos = i;
+
         for (i; i < z; i++) {
-            this.actualText[i] = this.placeholders[i];
+            if (check && text[i] && !this.checkOne(text[i], i)) {
+                this.actualText[i] = text[i];
+                check--;
+            } else {
+                this.actualText[i] = this.placeholders[i]
+            }
         }
 
         this.writeDown();
@@ -200,17 +194,14 @@
     };
 
     function _onChange () {
-        var difference,
-            start = this.firstCaret.begin || this.firstNonMaskedPosition,
-            newText = this.$el.val().split('')
-            ;  //newText.slice(this.hash.caret.begin, this.hash.caret.begin + difference);
-
-        difference = newText.length - this.size;
+        var start = this.firstCaret.begin || this.firstNonMaskedPosition,
+            newText = this.$el.val().split(''),
+            difference = newText.length - this.size;
 
         if (difference > 0) {
             this.addText(start, newText.slice(start, start + difference));
         } else {
-            this.removeText(start, this.firstCaret.end, difference);
+            this.removeText(start, this.firstCaret.end, difference, newText);
 
         }
 
