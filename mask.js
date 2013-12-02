@@ -1,4 +1,4 @@
-(function($) {
+    (function($) {
     var customOptioms = {
             placeholder: "_"
         },
@@ -20,9 +20,12 @@
                 _onButtonHandler: _onButtonHandler,
                 replaceOne: replaceOne,
                 checkFalsePosition: checkFalsePosition,
+                unCheckFalsePosition: unCheckFalsePosition,
+                unCheckPosition: unCheckPosition,
                 checkPosition: checkPosition,
                 addPlaces: addPlaces,
                 _onChange: _onChange,
+                _onDownButtonHandler: _onDownButtonHandler,
                 _onFocus: _onFocus,
                 cutOff: cutOff,
                 destroy: destroy
@@ -45,9 +48,48 @@
         }.bind(this));
     };
 
+    function unCheckFalsePosition (caret) {
+        while(!this.charTest[caret - 1] && caret > 0) {
+            caret--;
+        }
+
+        return caret;
+    };
+
     function checkFalsePosition (caret) {
-        return (caret < this.size && !this.charTest[caret])
-            ? this.checkFalsePosition(++caret) : caret;
+        while(!this.charTest[caret] && caret < this.size) {
+            caret++;
+        }
+
+        return caret;
+    };
+
+    function checkPosition (caret, isBackSpace) {
+        var i = this.size - 1,
+            result;
+
+        for (i; i > 0; i--) {
+            if (this.charTest[i] && this.newText[i] !== this.placeholders[i]) break;
+        }
+
+        result = this.checkFalsePosition(i + 1);
+
+        return  result;
+
+    };
+
+    function unCheckPosition (caret, isBackSpace) {
+        var i = this.size - 1,
+            result;
+
+        for (i; i > 0; i--) {
+            if (this.charTest[i] && this.newText[i] !== this.placeholders[i]) break;
+        }
+
+        result = this.unCheckFalsePosition(i - 1);
+
+        return  result;
+
     };
 
     function checkOne (char, index) {
@@ -61,7 +103,7 @@
 
         return caret && {
             end: caret.end,
-            start: caret.start
+            begin: caret.begin
         } || {};
     };
 
@@ -105,34 +147,46 @@
     };
 
     function _onMouseUpHandler (e) {
-        var caret = this.getCaretPosition();
-
-        this.setCaretPosition(caret);
+        // var caret =  this.checkPosition(this.getCaretPosition());
+        // if (caret) {
+        //     this.setCaretPosition(caret);    
+        // }
+        
     };
-
-    function checkPosition (caret) {
-        var i = 0,
-            result;
-
-        for (i; i < this.size - 1; i++) {
-            if (this.charTest[i] && this.newText[i] === this.placeholders[i]) break;
-        }
-
-        result = this.checkFalsePosition(i);
-        return  result;
-
-    }
 
     function _onFocus () {
 
     }
 
+    function _onDownButtonHandler (e) {
+        var caret = this.getCaretPosition(),
+            button = e.which,
+            text = $(e.target).val();
+        this.previousText = text.split('');
+        if(button === 46) {
+            this.previousText.splice(caret.end, (caret.end - caret.begin) + 1, '_');
+            $(e.target).val(this.previousText.join(''));
+        }
+
+        if (button === 8) {
+        }
+    }
+
     function _onButtonHandler (e) {
         var caret = this.getCaretPosition().end || 0,
-            button = e.which;
+            button = e.which,
+            text = $(e.target).val();
+
+        //console.log(button, text)
+
+        if(button === 8) {
+            caret = this.unCheckFalsePosition(caret);
+
+            this.setCaretPosition(caret);
+        }
 
         if (button === 39 || button === 40) {
-            caret = this.checkPosition(caret);
+            caret = this.checkFalsePosition(caret);
             this.setCaretPosition(caret);
         }
 
@@ -143,11 +197,14 @@
         var caret = this.getCaretPosition().end || 0,
             i = caret - 1;
         this.newText = this.$el.val().split('');
+        
+        if (this.newText.length > this.size) {
+            this.newText.splice(caret, this.newText.length - this.size);
+
+        }
 
         for (i; i <= this.size ; i++) {
-            if (this.previousText[i] !== this.newText[i]) {
-                this.checkOne(this.newText[i], i);
-            }
+            this.checkOne(this.newText[i], i);    
         }
 
         this.cutOff();
@@ -173,10 +230,11 @@
         this.$el.data({maskPlugin: this});
         this.maskAnalyse(mask, options.placeholder);
 
-        $(this.$el).on('input', this._onChange.bind(this));
-        $(this.$el).on('focus', this._onFocus.bind(this));
-        $(this.$el).on('mouseup', this._onMouseUpHandler.bind(this));
-        $(this.$el).on('keyup', this._onButtonHandler.bind(this));
+        $(this.$el).on('input', this._onChange.bind(this))
+            .on('focus', this._onFocus.bind(this))
+            .on('mouseup', this._onMouseUpHandler.bind(this))
+            .on('keyup', this._onButtonHandler.bind(this))
+            .on('keydown', this._onDownButtonHandler.bind(this));
 
         this._onChange();
 
