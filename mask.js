@@ -19,6 +19,7 @@
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 maskAnalyse: maskAnalyse,
+                isMasked: isMasked,
                 checkOne: checkOne,
                 writeDown: writeDown,
                 clearUp: clearUp,
@@ -58,8 +59,12 @@
         this.firstNonMaskedPosition++;
     };
 
+    function isMasked (index) {
+        return !this.charTest[index];
+    };
+
     function checkOne (char, index) {
-        return !(this.charTest[index]) || !(this.charTest[index]).test(char)
+        return !(!this.isMasked(index)) || !(this.charTest[index]).test(char)
     };
 
     function getCaretPosition () {
@@ -174,7 +179,7 @@
             i = start;
 
         while(n < end) {
-            if (this.charTest[i]) {
+            if (!this.isMasked(i)) {
 
                 if(!this.checkOne(text[n], i)) {
                     this.actualText[i] = text[n];
@@ -224,7 +229,7 @@
 
         $(this.$el).on('input', this._onChange.bind(this))
             .on('focus', this._onFocus.bind(this))
-            .on('mouseup', this._onMouseUpHandler.bind(this))
+           // .on('mouseup', this._onMouseUpHandler.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('blur', this._onBlur.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
