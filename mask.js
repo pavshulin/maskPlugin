@@ -13,6 +13,7 @@
                     begin: 0,
                     end: 0
                 },
+                caretMove: caretMove,
                 deleteHandler: 0,
                 masked: false,
                 caretMovement: false,
@@ -55,6 +56,7 @@
 
             return holder;
         }.bind(this));
+
         this.actualText = this.placeholders.slice();
     };
 
@@ -75,6 +77,17 @@
         } || {};
     };
 
+    function caretMove (index, direction) {
+        var stop = direction > 0 ? this.size + 1 : this.firstNonMaskedPosition;
+
+        while (this.isMasked(index + direction)) {
+            index++;
+            if (index === stop) break;
+        }
+
+        return index;
+    };
+
     function setCaretPosition (pos) {
         this.$el.caret(pos, pos);
     };
@@ -89,6 +102,65 @@
         this.actualText = this.placeholders.slice();
 
         this.$el.val('');
+    };
+
+    function removeText (start, end, diff, text) {
+        var startDelete,
+            endDelete,
+            pos,
+            editChars;
+
+        if (start === end) {
+            startDelete = start - 1 + this.deleteHandler;
+            endDelete = start + this.deleteHandler;
+        } else {
+            startDelete = start;
+            endDelete = end;
+            editChars = endDelete - startDelete + diff;
+        }
+
+        pos = startDelete + this.deleteHandler;
+        this.deleteHandler = 0;
+
+        for (startDelete; startDelete < endDelete; startDelete++) {
+            if (editChars && text[startDelete] && !this.checkOne(text[startDelete], startDelete)) {
+                this.actualText[startDelete] = text[startDelete];
+                editChars--;
+            } else {
+                this.actualText[startDelete] = this.placeholders[startDelete]
+            }
+        }
+
+        this.writeDown();
+        this.setCaretPosition(pos);
+    };
+
+    function addText (start, text) {
+        var end = start + text.length,
+            n = 0,
+            pos = 0,
+            i = start;
+
+        while(n < end) {
+            if (!this.isMasked(i)) {
+
+                if(!this.checkOne(text[n], i)) {
+                    this.actualText[i] = text[n];
+                    pos = i;
+                } else {
+                    i--;
+                }
+
+                //if not masked position move to next
+                n++;
+            }
+
+            i++;
+            if(i > this.size) break;
+        }
+
+        this.writeDown(this.actualText);
+        this.setCaretPosition(this.caretMove(pos, 1) + 1);
     };
 
     function _onFocus () {
@@ -147,60 +219,6 @@
         }
     };
 
-    function removeText (start, end, diff, text) {
-        var z, i, pos, check;
-        console.log(this.deleteHandler)
-        if (start === end) {
-            i = start - 1 + this.deleteHandler;
-            z = start + this.deleteHandler;
-        } else {
-            i = start;
-            z = end;
-            check = z - i + diff;
-        }
-
-        pos = i + this.deleteHandler;
-        this.deleteHandler = 0;
-
-        for (i; i < z; i++) {
-            if (check && text[i] && !this.checkOne(text[i], i)) {
-                this.actualText[i] = text[i];
-                check--;
-            } else {
-                this.actualText[i] = this.placeholders[i]
-            }
-        }
-
-        this.writeDown();
-        this.setCaretPosition(pos);
-    };
-
-    function addText (start, text) {
-        var end = start + text.length,
-            n = 0,
-            pos = 0,
-            i = start;
-
-        while(n < end) {
-            if (!this.isMasked(i)) {
-
-                if(!this.checkOne(text[n], i)) {
-                    this.actualText[i] = text[n];
-                    pos = i;
-                }
-
-                //if not masked position move to next
-                n++;
-            }
-
-            i++;
-            if(i > this.size) break;
-        }
-
-        this.writeDown(this.actualText);
-        this.setCaretPosition(++pos);
-    };
-
     function _onChange () {
         var start = this.firstCaret.begin || this.firstNonMaskedPosition,
             newText = this.$el.val().split(''),
@@ -210,7 +228,6 @@
             this.addText(start, newText.slice(start, start + difference));
         } else {
             this.removeText(start, this.firstCaret.end, difference, newText);
-
         }
 
     };

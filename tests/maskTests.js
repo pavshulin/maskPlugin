@@ -1,7 +1,7 @@
 (function ($) {
 
     test( "Initialization Test test", function() {
-        ok($.prototype.newMask, "newMask is not exist");
+        ok($.prototype.maskHelper, "newMask is not exist");
     });
 
 
