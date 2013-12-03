@@ -1,0 +1,11 @@
+.input-container{
+    display: block;
+    width: 260px;
+    margin:300px auto 0;
+    overflow:hidden;
+}
+.test-input {
+    margin: 0px 50px 20px 50px;
+    width: 160px;
+    display: inline-block;
+}

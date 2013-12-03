@@ -56,7 +56,6 @@
             return holder;
         }.bind(this));
         this.actualText = this.placeholders.slice();
-        this.firstNonMaskedPosition++;
     };
 
     function isMasked (index) {
@@ -141,23 +140,27 @@
         if(button === 8) {
         }
 
+        this.deleteHandler += !!(button === 46);
+
+
         if (button === 39 || button === 40) {
         }
     };
 
     function removeText (start, end, diff, text) {
         var z, i, pos, check;
-
+        console.log(this.deleteHandler)
         if (start === end) {
-            i = start - 1;
-            z = start;
+            i = start - 1 + this.deleteHandler;
+            z = start + this.deleteHandler;
         } else {
             i = start;
             z = end;
             check = z - i + diff;
         }
 
-        pos = i;
+        pos = i + this.deleteHandler;
+        this.deleteHandler = 0;
 
         for (i; i < z; i++) {
             if (check && text[i] && !this.checkOne(text[i], i)) {
