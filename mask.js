@@ -104,35 +104,14 @@
         this.$el.val('');
     };
 
-    function removeText (start, end, diff, text) {
-        var startDelete,
-            endDelete,
-            pos,
-            editChars;
+    function removeText (start, text) {
+        this.actualText = this.placeholders.slice();
 
-        if (start === end) {
-            startDelete = start - 1 + this.deleteHandler;
-            endDelete = start + this.deleteHandler;
-        } else {
-            startDelete = start;
-            endDelete = end;
-            editChars = endDelete - startDelete + diff;
-        }
-
-        pos = startDelete + this.deleteHandler;
-        this.deleteHandler = 0;
-
-        for (startDelete; startDelete < endDelete; startDelete++) {
-            if (editChars && text[startDelete] && !this.checkOne(text[startDelete], startDelete)) {
-                this.actualText[startDelete] = text[startDelete];
-                editChars--;
-            } else {
-                this.actualText[startDelete] = this.placeholders[startDelete]
-            }
-        }
+        this.addText(0, text);
 
         this.writeDown();
-        this.setCaretPosition(pos);
+        this.setCaretPosition(start - 1 + this.deleteHandler)
+        this.deleteHandler = 0;
     };
 
     function addText (start, text) {
@@ -142,6 +121,7 @@
             i = start;
 
         while(n < end) {
+            if(i >= this.size) break;
             if (!this.isMasked(i)) {
 
                 if(!this.checkOne(text[n], i)) {
@@ -152,10 +132,11 @@
                 }
                 //if not masked position move to next
                 n++;
+            } else {
+                this.actualText[i] = this.placeholders[i];
             }
 
             i++;
-            if(i > this.size) break;
         }
 
         this.writeDown(this.actualText);
@@ -170,6 +151,7 @@
         }
 
         this.writeDown(this.actualText);
+        this.setCaretPosition(this.firstNonMaskedPosition);
     }
 
     function _onBlur () {
@@ -221,7 +203,7 @@
         if (difference > 0) {
             this.addText(start, newText.slice(start, start + difference));
         } else {
-            this.removeText(start, this.firstCaret.end || this.size, difference, newText);
+            this.removeText(start, newText);
         }
 
         this.firstCaret.begin = undefined;
