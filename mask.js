@@ -21,7 +21,9 @@
                 getCaretPosition: getCaretPosition,
                 maskAnalyse: maskAnalyse,
                 isMasked: isMasked,
+                isEmptyField: isEmptyField,
                 checkOne: checkOne,
+                _onMouseUpHandler: _onMouseUpHandler,
                 writeDown: writeDown,
                 clearUp: clearUp,
                 _onButtonHandler: _onButtonHandler,
@@ -62,6 +64,10 @@
 
     function isMasked (index) {
         return !this.charTest[index];
+    };
+
+    function isEmptyField (index) {
+        return this.actualText[index] === this.placeholders[index];
     };
 
     function checkOne (char, index) {
@@ -120,23 +126,26 @@
             pos = 0,
             i = start;
 
-        while(n < end) {
-            if(i >= this.size) break;
-            if (!this.isMasked(i)) {
+        if(this.isEmptyField(i)) {
+            while(n < end) {
+                if(i >= this.size) break;
 
-                if(!this.checkOne(text[n], i)) {
-                    this.actualText[i] = text[n];
-                    pos = i;
+                if (!this.isMasked(i)) {
+
+                    if(!this.checkOne(text[n], i)) {
+                        this.actualText[i] = text[n];
+                        pos = i;
+                    } else {
+                        i--;
+                    }
+                    //if not masked position move to next
+                    n++;
                 } else {
-                    i--;
+                    this.actualText[i] = this.placeholders[i];
                 }
-                //if not masked position move to next
-                n++;
-            } else {
-                this.actualText[i] = this.placeholders[i];
-            }
 
-            i++;
+                i++;
+            }
         }
 
         this.writeDown(this.actualText);
@@ -182,6 +191,10 @@
         if (button === 8) {
 
         }
+    };
+
+    function _onMouseUpHandler (e) {
+
     }
 
     function _onButtonHandler (e) {
@@ -227,7 +240,7 @@
 
         $(this.$el).on('input', this._onChange.bind(this))
             .on('focus', this._onFocus.bind(this))
-           // .on('mouseup', this._onMouseUpHandler.bind(this))
+            .on('mouseup', this._onMouseUpHandler.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('blur', this._onBlur.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
