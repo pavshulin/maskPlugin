@@ -13,26 +13,27 @@
                     begin: 0,
                     end: 0
                 },
-                caretMove: caretMove,
                 deleteHandler: 0,
                 masked: false,
                 caretMovement: false,
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
+                caretMove: caretMove,
+                _onMouseUpHandler: _onMouseUpHandler,
+                _onDownButtonHandler: _onDownButtonHandler,
+                _onFocus: _onFocus,
+                _onButtonHandler: _onButtonHandler,
+                _onBlur: _onBlur,
+                _onChange: _onChange,
                 maskAnalyse: maskAnalyse,
+                writeDown: writeDown,
+                clearUp: clearUp,
+                removeText: removeText,
                 isMasked: isMasked,
                 isEmptyField: isEmptyField,
                 checkOne: checkOne,
-                _onMouseUpHandler: _onMouseUpHandler,
-                writeDown: writeDown,
-                clearUp: clearUp,
-                _onButtonHandler: _onButtonHandler,
-                _onChange: _onChange,
                 addText: addText,
-                removeText: removeText,
-                _onDownButtonHandler: _onDownButtonHandler,
-                _onFocus: _onFocus,
-                _onBlur: _onBlur,
+                positionChange: positionChange,
                 destroy: destroy
             };
         };
@@ -82,6 +83,17 @@
             begin: caret.begin
         } || {};
     };
+
+    function positionChange () {
+        var caret = this.getCaretPosition(),
+            start = caret && caret.begin || this.firstNonMaskedPosition;
+
+        while (!(start === this.firstNonMaskedPosition || !this.isEmptyField(start))) {
+            start--;
+        }
+
+        return ++start;
+    }
 
     function caretMove (index, direction) {
         var stop = direction > 0 ? this.size + 1 : this.firstNonMaskedPosition;
@@ -193,8 +205,8 @@
         }
     };
 
-    function _onMouseUpHandler (e) {
-
+    function _onMouseUpHandler () {
+        this.setCaretPosition(this.positionChange());
     }
 
     function _onButtonHandler (e) {
@@ -205,6 +217,7 @@
         }
 
         if (button === 39 || button === 40) {
+            this.setCaretPosition(this.positionChange());
         }
     };
 
