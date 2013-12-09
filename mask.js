@@ -7,8 +7,9 @@
             return {
                 actualText: [],
                 charTest: [],
+                placeholders: [],
                 lastEnteredPosition: 0,
-                firstNonMaskedPosition: 0,
+                firstNonMaskedPosition: undefined,
                 firstCaret: {
                     begin: 0,
                     end: 0
@@ -39,27 +40,28 @@
         };
 
     function maskAnalyse (mask, placeholder) {
-        var holder,
-            firstFlag = false;
+        var mask = mask.split(''), 
+            maskLength = mask.length,
+            i = 0,
+            char;
 
-        this.placeholders = $.map(mask.split(''), function (char, num) {
+        for (i; i < maskLength; i++) {    
+            char = mask[i];
 
             if (this.defs[char]) {
-                firstFlag = true;
                 this.charTest.push(new RegExp(this.defs[char]));
-                holder = placeholder;
+                this.placeholders.push(placeholder);
+
+                this.firstNonMaskedPosition = this.firstNonMaskedPosition || i;
             } else {
                 this.charTest.push(false);
-                holder = char;
-
-                if (!firstFlag) {
-                    this.firstNonMaskedPosition = num;
-                }
+                this.placeholders.push(char);
             }
+        }     
 
-            return holder;
-        }.bind(this));
-
+        this.firstNonMaskedPosition = this.firstNonMaskedPosition || this.size;
+        this.firstNonMaskedPosition--;
+        
         this.actualText = this.placeholders.slice();
     };
 
@@ -85,9 +87,8 @@
     };
 
     function positionChange () {
-        var caret = this.getCaretPosition(),
-            start = caret && caret.begin || this.firstNonMaskedPosition;
-
+        var start = this.size;
+        
         while (!(start === this.firstNonMaskedPosition || !this.isEmptyField(start))) {
             start--;
         }
@@ -161,6 +162,7 @@
         }
 
         this.writeDown(this.actualText);
+        console.log('move', this.$el.attr('id'))
         this.setCaretPosition(this.caretMove(pos, 1) + 1);
     };
 

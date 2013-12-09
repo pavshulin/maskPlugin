@@ -26,7 +26,41 @@
             mask = input.data('maskPlugin')
 
             ok(mask, 'newMask is created');
-            ok(mask.size === 4, 'parametr')
+            ok(mask.size === 4, 'parametr');
+            input.newMask('destroy');
+        });
+
+        test("Mask Analyze function test", function() {
+            var input = template.clone(),
+                mask = input.data('maskPlugin');
+
+            container.append(input);
+            input.newMask('1111', {placeholder: '_'});
+            mask = input.data('maskPlugin');
+
+            deepEqual(mask.placeholders, ['1', '1', '1', '1']);
+            deepEqual(mask.charTest, [false, false, false, false]);
+            equal(mask.firstNonMaskedPosition, 3);
+
+            input.remove();
+
+            input = template.clone();
+            container.append(input);
+            input.newMask('(09-90', {placeholder: '+'});
+            mask = input.data('maskPlugin');
+
+            deepEqual(mask.placeholders, ['(', '0', '+', '-', '+', '0']);
+            deepEqual(mask.charTest,  [
+                false,
+                false,
+                new RegExp($.mask.definitions['9']),
+                false,
+                new RegExp($.mask.definitions['9']),
+                false
+            ]);
+            equal(mask.firstNonMaskedPosition, 1);
+
+            input.newMask('destroy');
         });
 
     });
