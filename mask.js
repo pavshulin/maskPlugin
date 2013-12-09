@@ -8,7 +8,7 @@
                 actualText: [],
                 charTest: [],
                 placeholders: [],
-                lastEnteredPosition: 0,
+                lastSign: 0,
                 firstPosition: undefined,
                 firstCaret: {
                     begin: 0,
@@ -20,7 +20,7 @@
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 caretMove: caretMove,
-                _onMouseUpHandler: _onMouseUpHandler,
+                _onClickHandler: _onClickHandler,
                 _onDownButtonHandler: _onDownButtonHandler,
                 _onFocus: _onFocus,
                 _onButtonHandler: _onButtonHandler,
@@ -39,28 +39,9 @@
             };
         };
 
-    function maskAnalyse (mask, placeholder) {
-        var mask = mask.split(''), 
-            maskLength = mask.length,
-            i = 0,
-            char;
-
-        for (i; i < maskLength; i++) {    
-            char = mask[i];
-
-            if (!this.defs[char]) {
-                this.charTest.push(false);
-                this.placeholders.push(char);
-                continue;
-            }
-
-            this.firstPosition = this.firstPosition || i - 1;
-            this.charTest.push(new RegExp(this.defs[char]));
-            this.placeholders.push(placeholder);
-        }     
-
-        this.actualText = this.placeholders.slice();
-    };
+    /*
+    * Utils
+    * */
 
     function isMasked (index) {
         return !this.charTest[index];
@@ -75,17 +56,28 @@
     };
 
     function getCaretPosition () {
-        var caret = this.$el.caret();
+        var begin,
+            end;
 
-        return caret && {
-            end: caret.end,
-            begin: caret.begin
-        } || {};
+        if (this.$el.setSelectionRange) {
+            begin = this.$el.selectionStart;
+            end = this.$el.selectionEnd;
+        } else if (document.selection && document.selection.createRange) {
+            var range = document.selection.createRange();
+            begin = 0 - range.duplicate().moveStart('character', -100000);
+            end = begin + range.text.length;
+        }
+
+        return {
+            begin: begin,
+            end: end
+        };
     };
 
     function positionChange () {
-        var start = this.size;
-        
+        var start = this.getCaretPosition().begin || this.size;
+
+        if(start < this.lastSign + 1) return start;
         while (!(start === this.firstPosition || !this.isEmptyField(start))) {
             start--;
         }
@@ -136,14 +128,15 @@
             pos = 0,
             i = start;
 
-        if(this.isEmptyField(i)) {
+
             while(n < end) {
-                if(i >= this.size) break;
+                if(i >= this.size || !this.isEmptyField(i)) break;
 
                 if (!this.isMasked(i)) {
 
                     if(!this.checkOne(text[n], i)) {
                         this.actualText[i] = text[n];
+                        this.lastSign = i;
                         pos = i;
                     } else {
                         i--;
@@ -156,19 +149,15 @@
 
                 i++;
             }
-        }
 
         this.writeDown(this.actualText);
-        console.log('move', this.$el.attr('id'))
-        this.setCaretPosition(this.caretMove(pos, 1) + 1);
+
+        this.setCaretPosition(this.caretMove(this.lastSign, 1) + 1);
     };
 
     function _onFocus () {
         var caret = this.getCaretPosition().end || this.firstPosition;
-
-        if (!this.masked) {
-            this.masked = true;
-        }
+        console.log('focus')
 
         this.writeDown(this.actualText);
         this.setCaretPosition(this.firstPosition);
@@ -177,6 +166,7 @@
     function _onBlur () {
         var i = 0,
             masked = false;
+
         for (i; i < this.size; i++) {
             if (this.charTest[i] && this.placeholders[i] !== this.actualText[i]) {
                 masked = true;
@@ -185,7 +175,7 @@
         }
 
         if (!masked) {
-            this.clearUp();
+            //this.clearUp();
         }
 
         this.masked = masked;
@@ -204,8 +194,14 @@
         }
     };
 
-    function _onMouseUpHandler () {
-        this.setCaretPosition(this.positionChange());
+    function _onClickHandler () {
+        var caret = this.getCaretPosition();
+
+        if (caret.begin === caret.end) {
+            this.$el.attr('disabled', 'disabled');
+            this.setCaretPosition(this.positionChange());
+            this.$el.removeAttr('disabled');
+        }
     }
 
     function _onButtonHandler (e) {
@@ -215,13 +211,13 @@
         if(button === 8) {
         }
 
-        if (button === 39 || button === 40) {
+        if (!e.shiftKey && (button === 39 || button === 40) ) {
             this.setCaretPosition(this.positionChange());
         }
     };
 
     function _onChange () {
-        var start = this.firstCaret.begin || this.firstPosition,
+        var start = this.firstCaret.begin || this.lastSign + 1,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size;
 
@@ -240,6 +236,32 @@
         this.$el.off('input', this._onChange);
     };
 
+    function maskAnalyse (mask, placeholder) {
+        var mask = mask.split(''),
+            maskLength = mask.length,
+            i = 0,
+            char;
+
+        for (i; i < maskLength; i++) {
+            char = mask[i];
+
+            if (!this.defs[char]) {
+                this.charTest.push(false);
+                this.placeholders.push(char);
+                continue;
+            }
+
+            if (this.firstPosition === undefined) {
+                this.firstPosition = i - 1;
+            }
+
+            this.charTest.push(new RegExp(this.defs[char]));
+            this.placeholders.push(placeholder);
+        }
+
+        this.actualText = this.placeholders.slice();
+    };
+
     function maskPlugin (element, mask, options) {
         $.extend(this, _customMask());
         this.$el = element;
@@ -252,7 +274,7 @@
 
         $(this.$el).on('input', this._onChange.bind(this))
             .on('focus', this._onFocus.bind(this))
-            .on('mouseup', this._onMouseUpHandler.bind(this))
+            .on('click', this._onClickHandler.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('blur', this._onBlur.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
@@ -304,15 +326,7 @@
                     }
                 });
             } else {
-                if (this[0].setSelectionRange) {
-                    begin = this[0].selectionStart;
-                    end = this[0].selectionEnd;
-                } else if (document.selection && document.selection.createRange) {
-                    var range = document.selection.createRange();
-                    begin = 0 - range.duplicate().moveStart('character', -100000);
-                    end = begin + range.text.length;
-                }
-                return { begin: begin, end: end };
+
             }
         }
     });

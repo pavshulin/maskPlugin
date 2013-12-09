@@ -31,42 +31,41 @@
         });
 
         test("Mask Analyze function test", function() {
-            var input = template.clone(),
+            var testDefinitions = [{
+                    mask: '11119',
+                    placeholder: '_',
+                    testPlaceholders: ['1', '1', '1', '1', '_'],
+                    testMask: [
+                        false, false, false, false,
+                        new RegExp($.mask.definitions['9'])
+                    ]
+                }, {
+                    mask: '(09-90',
+                    placeholder: '+',
+                    testPlaceholders: ['(', '0', '+', '-', '+', '0'],
+                    testMask: [
+                        false, false, new RegExp($.mask.definitions['9']),
+                        false,  new RegExp($.mask.definitions['9']), false
+                    ]
+                }],
+                testInd,
+                test,
+                mask,
+                input;
+
+            for (testInd in testDefinitions) {
+                input = template.clone();
+                test = testDefinitions[testInd];
+                container.append(input);
+
+                input.newMask(test.mask, {placeholder: test.placeholder});
                 mask = input.data('maskPlugin');
 
-            container.append(input);
-            input.newMask('11119', {placeholder: '_'});
-            mask = input.data('maskPlugin');
+                deepEqual(mask.placeholders, test.testPlaceholders);
+                deepEqual(mask.charTest, test.testMask);
 
-            deepEqual(mask.placeholders, ['1', '1', '1', '1', '_']);
-            deepEqual(mask.charTest, [
-                false,
-                false,
-                false,
-                false,
-                new RegExp($.mask.definitions['9'])
-            ]);
-            equal(mask.firstPosition, 3);
-
-            input.remove();
-
-            input = template.clone();
-            container.append(input);
-            input.newMask('(09-90', {placeholder: '+'});
-            mask = input.data('maskPlugin');
-
-            deepEqual(mask.placeholders, ['(', '0', '+', '-', '+', '0']);
-            deepEqual(mask.charTest,  [
-                false,
-                false,
-                new RegExp($.mask.definitions['9']),
-                false,
-                new RegExp($.mask.definitions['9']),
-                false
-            ]);
-            equal(mask.firstPosition, 1);
-
-            input.newMask('destroy');
+                input.newMask('destroy');
+            }
         });
 
     });
