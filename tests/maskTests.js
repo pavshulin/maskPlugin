@@ -35,12 +35,18 @@
                 mask = input.data('maskPlugin');
 
             container.append(input);
-            input.newMask('1111', {placeholder: '_'});
+            input.newMask('11119', {placeholder: '_'});
             mask = input.data('maskPlugin');
 
-            deepEqual(mask.placeholders, ['1', '1', '1', '1']);
-            deepEqual(mask.charTest, [false, false, false, false]);
-            equal(mask.firstNonMaskedPosition, 3);
+            deepEqual(mask.placeholders, ['1', '1', '1', '1', '_']);
+            deepEqual(mask.charTest, [
+                false,
+                false,
+                false,
+                false,
+                new RegExp($.mask.definitions['9'])
+            ]);
+            equal(mask.firstPosition, 3);
 
             input.remove();
 
@@ -58,7 +64,7 @@
                 new RegExp($.mask.definitions['9']),
                 false
             ]);
-            equal(mask.firstNonMaskedPosition, 1);
+            equal(mask.firstPosition, 1);
 
             input.newMask('destroy');
         });

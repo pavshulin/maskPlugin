@@ -9,7 +9,7 @@
                 charTest: [],
                 placeholders: [],
                 lastEnteredPosition: 0,
-                firstNonMaskedPosition: undefined,
+                firstPosition: undefined,
                 firstCaret: {
                     begin: 0,
                     end: 0
@@ -48,20 +48,17 @@
         for (i; i < maskLength; i++) {    
             char = mask[i];
 
-            if (this.defs[char]) {
-                this.charTest.push(new RegExp(this.defs[char]));
-                this.placeholders.push(placeholder);
-
-                this.firstNonMaskedPosition = this.firstNonMaskedPosition || i;
-            } else {
+            if (!this.defs[char]) {
                 this.charTest.push(false);
                 this.placeholders.push(char);
+                continue;
             }
+
+            this.firstPosition = this.firstPosition || i - 1;
+            this.charTest.push(new RegExp(this.defs[char]));
+            this.placeholders.push(placeholder);
         }     
 
-        this.firstNonMaskedPosition = this.firstNonMaskedPosition || this.size;
-        this.firstNonMaskedPosition--;
-        
         this.actualText = this.placeholders.slice();
     };
 
@@ -89,7 +86,7 @@
     function positionChange () {
         var start = this.size;
         
-        while (!(start === this.firstNonMaskedPosition || !this.isEmptyField(start))) {
+        while (!(start === this.firstPosition || !this.isEmptyField(start))) {
             start--;
         }
 
@@ -97,7 +94,7 @@
     }
 
     function caretMove (index, direction) {
-        var stop = direction > 0 ? this.size + 1 : this.firstNonMaskedPosition;
+        var stop = direction > 0 ? this.size + 1 : this.firstPosition;
 
         while (this.isMasked(index + direction)) {
             index++;
@@ -167,14 +164,14 @@
     };
 
     function _onFocus () {
-        var caret = this.getCaretPosition().end || this.firstNonMaskedPosition;
+        var caret = this.getCaretPosition().end || this.firstPosition;
 
         if (!this.masked) {
             this.masked = true;
         }
 
         this.writeDown(this.actualText);
-        this.setCaretPosition(this.firstNonMaskedPosition);
+        this.setCaretPosition(this.firstPosition);
     }
 
     function _onBlur () {
@@ -212,7 +209,7 @@
     }
 
     function _onButtonHandler (e) {
-        var caret = this.getCaretPosition().end || this.firstNonMaskedPosition,
+        var caret = this.getCaretPosition().end || this.firstPosition,
             button = e.which;
 
         if(button === 8) {
@@ -224,7 +221,7 @@
     };
 
     function _onChange () {
-        var start = this.firstCaret.begin || this.firstNonMaskedPosition,
+        var start = this.firstCaret.begin || this.firstPosition,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size;
 
