@@ -17,24 +17,29 @@
                 deleteHandler: 0,
                 masked: false,
                 caretMovement: false,
+                
+                isMasked: isMasked,
+                isEmptyField: isEmptyField,
+                checkOne: checkOne,
+
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 caretMove: caretMove,
+                positionChange: positionChange,
+                
+                writeDown: writeDown,
+                clearUp: clearUp,
+                removeText: removeText,
+                addText: addText,
+
                 _onClickHandler: _onClickHandler,
                 _onDownButtonHandler: _onDownButtonHandler,
                 _onFocus: _onFocus,
                 _onButtonHandler: _onButtonHandler,
                 _onBlur: _onBlur,
                 _onChange: _onChange,
+                
                 maskAnalyse: maskAnalyse,
-                writeDown: writeDown,
-                clearUp: clearUp,
-                removeText: removeText,
-                isMasked: isMasked,
-                isEmptyField: isEmptyField,
-                checkOne: checkOne,
-                addText: addText,
-                positionChange: positionChange,
                 destroy: destroy
             };
         };
@@ -55,13 +60,17 @@
         return !(!this.isMasked(index)) || !(this.charTest[index]).test(char)
     };
 
+    /**
+    * Caret functions
+    */
+
     function getCaretPosition () {
         var begin,
             end;
 
         if (this.$el.setSelectionRange) {
-            begin = this.$el.selectionStart;
-            end = this.$el.selectionEnd;
+            begin = ;
+            end = ;
         } else if (document.selection && document.selection.createRange) {
             var range = document.selection.createRange();
             begin = 0 - range.duplicate().moveStart('character', -100000);
@@ -69,8 +78,8 @@
         }
 
         return {
-            begin: begin,
-            end: end
+            begin: this.$el.selectionStart,
+            end: this.$el.selectionEnd
         };
     };
 
@@ -96,9 +105,9 @@
         return index;
     };
 
-    function setCaretPosition (pos) {
-        this.$el.caret(pos, pos);
-    };
+    /*
+    *  Text creationals function
+    */
 
     function writeDown (text) {
         text = text || this.actualText;
@@ -154,6 +163,10 @@
 
         this.setCaretPosition(this.caretMove(this.lastSign, 1) + 1);
     };
+
+    /**
+    * Event Handlers functions
+    */
 
     function _onFocus () {
         var caret = this.getCaretPosition().end || this.firstPosition;
@@ -231,6 +244,10 @@
         this.firstCaret.end = undefined;
     };
 
+    /**
+    * Initialize and destroy functions
+    */
+
     function destroy () {
         this.$el.attr('maxlength', this._maxlengthCash);
         this.$el.off('input', this._onChange);
@@ -284,7 +301,7 @@
 
     function _initSeveral (elements, mask, options) {
         $(elements).each(function () {
-            _initOne(elements, mask, options);
+            _initOne(this, mask, options);
         });
     };
 
@@ -313,18 +330,7 @@
         caret: function(begin, end) {
             if (this.length == 0) return;
             if (typeof begin == 'number') {
-                end = (typeof end == 'number') ? end : begin;
-                return this.each(function() {
-                    if (this.setSelectionRange) {
-                        this.setSelectionRange(begin, end);
-                    } else if (this.createTextRange) {
-                        var range = this.createTextRange();
-                        range.collapse(true);
-                        range.moveEnd('character', end);
-                        range.moveStart('character', begin);
-                        range.select();
-                    }
-                });
+                
             } else {
 
             }
