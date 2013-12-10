@@ -19,11 +19,8 @@
                 removeText: removeText,
                 addText: addText,
 
-                _onMouseDown: _onMouseDown,
-                _onMouseUp: _onMouseUp,
                 _onDownButtonHandler: _onDownButtonHandler,
                 _onButtonHandler: _onButtonHandler,
-                _onBlur: _onBlur,
                 _onChange: _onChange,
                 
                 maskAnalyse: maskAnalyse,
@@ -95,7 +92,6 @@
         text = text || this.actualText;
         this.actualText = text;
         this.$el.val(text.join(''));
-        this.$el.val(text.join(''));
     };
 
     function clearUp () {
@@ -151,48 +147,12 @@
     * Event Handlers functions
     */
 
-    function _onBlur () {
-        var i = 0,
-            masked = false;
-
-        for (i; i < this.size; i++) {
-            if (this.charTest[i] && this.placeholders[i] !== this.actualText[i]) {
-                masked = true;
-                break;
-            }
-        }
-
-        if (!masked) {
-            //this.clearUp();
-        }
-
-        this.masked = masked;
-    }
-
     function _onDownButtonHandler (event) {
         var caret = this.getCaretPosition(),
             button = event.which;
 
         this.firstCaret = caret;
         this.deleteHandler += !!(button === 46);
-    };
-
-    function _onFocusIn () {
-        //this.writeDown(this.actualText);
-    };
-
-    function _onMouseUp (event) {
-        var caret = this.getCaretPosition();
-
-        if (caret.begin === caret.end) {
-            this.$el.attr('disabled', 'disabled');
-            //this.writeDown(this.actualText);
-            this.setCaretPosition(this.positionChange());
-            this.$el.removeAttr('disabled');
-        }
-    };
-
-    function _onMouseDown (event) {
     };
 
     function _onButtonHandler (e) {
@@ -281,11 +241,7 @@
         this.maskAnalyse(mask, options.placeholder);
 
         $(this.$el).on('input', this._onChange.bind(this))
-            .on('mouseup', this._onMouseUp.bind(this))
-            .on('mousedown', this._onMouseDown.bind(this))
-            //.on('focusin', this._onFocusIn.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
-            .on('blur', this._onBlur.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
 
         return this;
