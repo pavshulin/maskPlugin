@@ -5,19 +5,6 @@
 
         _customMask = function () {
             return {
-                actualText: [],
-                charTest: [],
-                placeholders: [],
-                lastSign: 0,
-                firstPosition: undefined,
-                firstCaret: {
-                    begin: 0,
-                    end: 0
-                },
-                deleteHandler: 0,
-                masked: false,
-                caretMovement: false,
-                
                 isMasked: isMasked,
                 isEmptyField: isEmptyField,
                 checkOne: checkOne,
@@ -32,9 +19,9 @@
                 removeText: removeText,
                 addText: addText,
 
-                _onClickHandler: _onClickHandler,
+                _onMouseDown: _onMouseDown,
+                _onMouseUp: _onMouseUp,
                 _onDownButtonHandler: _onDownButtonHandler,
-                _onFocus: _onFocus,
                 _onButtonHandler: _onButtonHandler,
                 _onBlur: _onBlur,
                 _onChange: _onChange,
@@ -44,9 +31,9 @@
             };
         };
 
-    /*
+    /**
     * Utils
-    * */
+    */
 
     function isMasked (index) {
         return !this.charTest[index];
@@ -64,19 +51,14 @@
     * Caret functions
     */
 
+    function setCaretPosition (begin, end) {
+        end = end || begin;
+        this.$el.each(function () {
+            this.setSelectionRange(begin, end);
+        });
+    }
+
     function getCaretPosition () {
-        var begin,
-            end;
-
-        if (this.$el.setSelectionRange) {
-            begin = ;
-            end = ;
-        } else if (document.selection && document.selection.createRange) {
-            var range = document.selection.createRange();
-            begin = 0 - range.duplicate().moveStart('character', -100000);
-            end = begin + range.text.length;
-        }
-
         return {
             begin: this.$el.selectionStart,
             end: this.$el.selectionEnd
@@ -105,13 +87,14 @@
         return index;
     };
 
-    /*
+    /**
     *  Text creationals function
     */
 
     function writeDown (text) {
         text = text || this.actualText;
         this.actualText = text;
+        this.$el.val(text.join(''));
         this.$el.val(text.join(''));
     };
 
@@ -168,14 +151,6 @@
     * Event Handlers functions
     */
 
-    function _onFocus () {
-        var caret = this.getCaretPosition().end || this.firstPosition;
-        console.log('focus')
-
-        this.writeDown(this.actualText);
-        this.setCaretPosition(this.firstPosition);
-    }
-
     function _onBlur () {
         var i = 0,
             masked = false;
@@ -194,28 +169,31 @@
         this.masked = masked;
     }
 
-    function _onDownButtonHandler (e) {
+    function _onDownButtonHandler (event) {
         var caret = this.getCaretPosition(),
-            button = e.which;
+            button = event.which;
 
         this.firstCaret = caret;
-
         this.deleteHandler += !!(button === 46);
-
-        if (button === 8) {
-
-        }
     };
 
-    function _onClickHandler () {
+    function _onFocusIn () {
+        //this.writeDown(this.actualText);
+    };
+
+    function _onMouseUp (event) {
         var caret = this.getCaretPosition();
 
         if (caret.begin === caret.end) {
             this.$el.attr('disabled', 'disabled');
+            //this.writeDown(this.actualText);
             this.setCaretPosition(this.positionChange());
             this.$el.removeAttr('disabled');
         }
-    }
+    };
+
+    function _onMouseDown (event) {
+    };
 
     function _onButtonHandler (e) {
         var caret = this.getCaretPosition().end || this.firstPosition,
@@ -262,7 +240,7 @@
         for (i; i < maskLength; i++) {
             char = mask[i];
 
-            if (!this.defs[char]) {
+            if (!$.newMask.definitions[char]) {
                 this.charTest.push(false);
                 this.placeholders.push(char);
                 continue;
@@ -272,7 +250,7 @@
                 this.firstPosition = i - 1;
             }
 
-            this.charTest.push(new RegExp(this.defs[char]));
+            this.charTest.push(new RegExp($.newMask.definitions[char]));
             this.placeholders.push(placeholder);
         }
 
@@ -285,13 +263,27 @@
         this.size = mask.length;
         this._maxlengthCash =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
-        this.defs = $.mask.definitions;
         this.$el.data({maskPlugin: this});
+
+        this.actualText = [];
+        this.charTest = [];
+        this.placeholders = [];
+        this.lastSign = 0;
+        this.firstPosition = undefined;
+        this.firstCaret = {
+            begin: 0,
+            end: 0
+        };
+        this.deleteHandler = 0;
+        this.masked = false;
+        this.caretMovement = false;
+
         this.maskAnalyse(mask, options.placeholder);
 
         $(this.$el).on('input', this._onChange.bind(this))
-            .on('focus', this._onFocus.bind(this))
-            .on('click', this._onClickHandler.bind(this))
+            .on('mouseup', this._onMouseUp.bind(this))
+            .on('mousedown', this._onMouseDown.bind(this))
+            //.on('focusin', this._onFocusIn.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('blur', this._onBlur.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
@@ -299,43 +291,33 @@
         return this;
     };
 
-    function _initSeveral (elements, mask, options) {
-        $(elements).each(function () {
-            _initOne(this, mask, options);
-        });
-    };
-
-    function _initOne (element, mask, options) {
-        new maskPlugin (element, mask, options);
-    };
-
     function newMask (mask, options) {
-        var method = $(this).length > 1 ? _initSeveral : _initOne;
-        if (this.data('maskPlugin')) {
-            this.data('maskPlugin')[mask] && this.data('maskPlugin')[mask]();
-            return false;
-        }
-        options = $.extend(customOptioms, options);
+        return this.each(function () {
+            if ($(this).data('maskPlugin')) {
+                $(this).data('maskPlugin')[mask] && $(this).data('maskPlugin')[mask]();
+                return false;
+            }
+            options = $.extend(customOptioms, options);
 
-        if (!mask || !mask.length || mask.length <= 0|| $(this).length === 0) return this;
+            if (!mask || !mask.length || mask.length <= 0|| $(this).length === 0) return this;
 
 
-        method(this, mask, options);
+            new maskPlugin($(this), mask, options);
 
-        return this;
+            return this;
+        })
+
     };
 
     $.fn.extend({
-        newMask: newMask,
-        caret: function(begin, end) {
-            if (this.length == 0) return;
-            if (typeof begin == 'number') {
-                
-            } else {
-
-            }
-        }
+        newMask: newMask
     });
+
+    $.newMask = {
+        definitions: {
+
+        }
+    };
 
 })(jQuery);
 
