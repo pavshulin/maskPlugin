@@ -1,6 +1,7 @@
     (function($) {
     var customOptioms = {
-            placeholder: "_"
+            placeholder: "_",
+            caretMove: true
         },
 
         _customMask = function () {
@@ -16,9 +17,12 @@
                 
                 writeDown: writeDown,
                 clearUp: clearUp,
+                fillField: fillField,
                 removeText: removeText,
                 addText: addText,
 
+                _onFocus: _onFocus,
+                _onMouseUp: _onMouseUp,
                 _onDownButtonHandler: _onDownButtonHandler,
                 _onButtonHandler: _onButtonHandler,
                 _onChange: _onChange,
@@ -50,15 +54,17 @@
 
     function setCaretPosition (begin, end) {
         end = end || begin;
+
         this.$el.each(function () {
             this.setSelectionRange(begin, end);
+
         });
     }
 
     function getCaretPosition () {
         return {
-            begin: this.$el.selectionStart,
-            end: this.$el.selectionEnd
+            begin: this.$el[0].selectionStart,
+            end: this.$el[0].selectionEnd
         };
     };
 
@@ -92,10 +98,14 @@
         text = text || this.actualText;
         this.actualText = text;
         this.$el.val(text.join(''));
+        this.masked = true;
     };
 
     function clearUp () {
         this.actualText = this.placeholders.slice();
+
+        this.isEntered = false;
+        this.masked = false;
 
         this.$el.val('');
     };
@@ -103,27 +113,23 @@
     function removeText (start, text) {
         this.actualText = this.placeholders.slice();
 
+        this.isEntered = false;
+        this.lastSign = this.firstPosition;
         this.addText(0, text);
-
-        this.writeDown();
-        this.setCaretPosition(start - 1 + this.deleteHandler)
-        this.deleteHandler = 0;
     };
 
     function addText (start, text) {
-        var end = start + text.length,
+        var end = text.length,
             n = 0,
             pos = 0,
             i = start;
 
-
-            while(n < end) {
-                if(i >= this.size || !this.isEmptyField(i)) break;
+            while(n < end && !(i >= this.size || !this.isEmptyField(i))) {
 
                 if (!this.isMasked(i)) {
-
                     if(!this.checkOne(text[n], i)) {
                         this.actualText[i] = text[n];
+                        this.isEntered = true;
                         this.lastSign = i;
                         pos = i;
                     } else {
@@ -131,33 +137,42 @@
                     }
                     //if not masked position move to next
                     n++;
-                } else {
-                    this.actualText[i] = this.placeholders[i];
                 }
 
                 i++;
             }
+    };
 
-        this.writeDown(this.actualText);
-
-        this.setCaretPosition(this.caretMove(this.lastSign, 1) + 1);
+    function fillField () {
+        if (!this.masked) {
+            this.writeDown();
+        }
     };
 
     /**
     * Event Handlers functions
     */
 
+    function _onFocus () {
+        this.fillField();
+        this.setCaretPosition(this.lastSign + 1 || 0);
+    };
+
+    function _onMouseUp () {
+        this.fillField();
+        this.setCaretPosition(this.lastSign + 1 || 0);
+    };
+
     function _onDownButtonHandler (event) {
         var caret = this.getCaretPosition(),
             button = event.which;
 
         this.firstCaret = caret;
-        this.deleteHandler += !!(button === 46);
+        this.deleteHandler = button === 46;
     };
 
     function _onButtonHandler (e) {
-        var caret = this.getCaretPosition().end || this.firstPosition,
-            button = e.which;
+        var button = e.which;
 
         if(button === 8) {
         }
@@ -168,16 +183,24 @@
     };
 
     function _onChange () {
-        var start = this.firstCaret.begin || this.lastSign + 1,
+        var start = this.firstCaret.begin || this.getCaretPosition().begin,
             newText = this.$el.val().split(''),
-            difference = newText.length - this.size;
+            difference = newText.length - this.size,
+            pos;
 
         if (difference > 0) {
-            this.addText(start, newText.slice(start, start + difference));
+            this.addText(start, newText.slice(start, newText.length));
+            this.writeDown();
+            pos = this.caretMove(this.lastSign, 1) + 1;
         } else {
             this.removeText(start, newText);
+            this.writeDown();
+            pos = this.deleteHandler ? start : (this.lastSign || this.firstPosition) + !!this.isEntered
         }
 
+        this.setCaretPosition(pos);
+
+        this.deleteHandler = false;
         this.firstCaret.begin = undefined;
         this.firstCaret.end = undefined;
     };
@@ -207,7 +230,7 @@
             }
 
             if (this.firstPosition === undefined) {
-                this.firstPosition = i - 1;
+                this.firstPosition = i  ;
             }
 
             this.charTest.push(new RegExp($.newMask.definitions[char]));
@@ -227,8 +250,10 @@
 
         this.actualText = [];
         this.charTest = [];
+        this.isEntered = false;
         this.placeholders = [];
         this.lastSign = 0;
+        this.masked = false;
         this.firstPosition = undefined;
         this.firstCaret = {
             begin: 0,
@@ -240,7 +265,10 @@
 
         this.maskAnalyse(mask, options.placeholder);
 
-        $(this.$el).on('input', this._onChange.bind(this))
+        $(this.$el)
+            .on('input', this._onChange.bind(this))
+            .on('focus', this._onFocus.bind(this))
+            .on('mouseup', this._onMouseUp.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
 
@@ -248,9 +276,10 @@
     };
 
     function newMask (mask, options) {
+        var maskObj = $(this).data('maskPlugin');
         return this.each(function () {
-            if ($(this).data('maskPlugin')) {
-                $(this).data('maskPlugin')[mask] && $(this).data('maskPlugin')[mask]();
+            if (maskObj) {
+                maskObj[mask] && maskObj[mask]();
                 return false;
             }
             options = $.extend(customOptioms, options);
@@ -271,7 +300,6 @@
 
     $.newMask = {
         definitions: {
-
         }
     };
 

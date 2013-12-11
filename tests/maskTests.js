@@ -1,15 +1,14 @@
 (function ($) {
-    $.mask = {};
-
-    $.mask.definitions = {
-        '9': "[0-9]"
-    };
 
     $(function () {
         var template = $('<input />', {
             type: 'text'
         }),
-            container = $('#qunit-fixture');
+            container = $('#qunit-fixture'),
+                defs;
+
+        $.newMask.definitions['9'] = "[0-9]";
+        defs = $.newMask.definitions;
 
         test( "Initialization Test test", function() {
             ok($.prototype.newMask, "newMask is not exist");
@@ -17,7 +16,7 @@
 
         test( "Initialization Test test", function() {
             var input = template.clone(),
-                mask = input.data('maskPlugin');
+                mask;
 
             container.append(input);
 
@@ -26,27 +25,36 @@
             mask = input.data('maskPlugin')
 
             ok(mask, 'newMask is created');
-            ok(mask.size === 4, 'parametr');
+
             input.newMask('destroy');
         });
 
         test("Mask Analyze function test", function() {
-            var testDefinitions = [{
+            var numReg = new RegExp(defs['9']),
+                testDefinitions = [{
                     mask: '11119',
                     placeholder: '_',
                     testPlaceholders: ['1', '1', '1', '1', '_'],
-                    testMask: [
-                        false, false, false, false,
-                        new RegExp($.mask.definitions['9'])
-                    ]
+                    testMask: [ false, false, false, false, numReg],
+                    position: 0
                 }, {
                     mask: '(09-90',
                     placeholder: '+',
                     testPlaceholders: ['(', '0', '+', '-', '+', '0'],
-                    testMask: [
-                        false, false, new RegExp($.mask.definitions['9']),
-                        false,  new RegExp($.mask.definitions['9']), false
-                    ]
+                    testMask: [ false, false, numReg, false,  numReg, false],
+                    position: 1
+                }, {
+                    mask: '----',
+                    placeholder: '+',
+                    testPlaceholders: ['-', '-', '-', '-'],
+                    testMask: [false, false, false, false],
+                    position: 0
+                }, {
+                    mask: '999',
+                    placeholder: 'A',
+                    testPlaceholders: ['A', 'A', 'A'],
+                    testMask: [numReg, numReg, numReg],
+                    position: 2
                 }],
                 testInd,
                 test,
