@@ -10,11 +10,11 @@
         $.newMask.definitions['9'] = "[0-9]";
         defs = $.newMask.definitions;
 
-        test( "Initialization Test test", function() {
+        test( "Initialization Test test", function () {
             ok($.prototype.newMask, "newMask is not exist");
         });
 
-        test( "Initialization Test test", function() {
+        test( "Initialization Test test", function () {
             var input = template.clone(),
                 mask;
 
@@ -29,7 +29,7 @@
             input.newMask('destroy');
         });
 
-        test("Mask Analyze function test", function() {
+        test("Mask Analyze function test", function () {
             var numReg = new RegExp(defs['9']),
                 testDefinitions = [{
                     mask: '11119',
@@ -74,6 +74,59 @@
 
                 input.newMask('destroy');
             }
+        });
+
+        test("isMasked function test", function () {
+            var input = template.clone(),
+                mask;
+
+            container.append(input);
+
+            input.newMask('999 - 99', {placeholder: '_'});
+            mask = input.data('maskPlugin');
+
+            ok(mask.isMasked, 'function isMasked was not exist');
+
+            ok(mask.isMasked(3), 'function isMasked works wrong');
+            ok(mask.isMasked(5), 'function isMasked works wrong');
+            ok(!mask.isMasked(1), 'function isMasked works wrong');
+            ok(!mask.isMasked(6), 'function isMasked works wrong');
+        });
+
+        test("isEmptyField function test", function () {
+            var input = template.clone(),
+                mask;
+
+            container.append(input);
+
+            input.newMask('999 - 99', {placeholder: '_'});
+            mask = input.data('maskPlugin');
+
+            ok(mask.isEmptyField, 'function isEmptyField was not exist');
+
+            ok(mask.isEmptyField(1), 'function isEmptyField works wrong');
+            ok(mask.isEmptyField(2), 'function isEmptyField works wrong');
+            mask.actualText[1] = '2';
+            mask.actualText[2] = '4';
+
+            ok(!mask.isEmptyField(1), 'function isEmptyField works wrong');
+            ok(!mask.isEmptyField(2), 'function isEmptyField works wrong');
+        });
+
+        test("checkOne function test", function () {
+            var input = template.clone(),
+                mask;
+
+            container.append(input);
+
+            input.newMask('999 - 99', {placeholder: '_'});
+            mask = input.data('maskPlugin');
+
+            ok(mask.checkOne, 'function checkOne was not exist');
+
+            ok(mask.checkOne('a', 1), 'function checkOne works wrong');
+            ok(!mask.checkOne('1', 1), 'function checkOne works wrong');
+            ok(mask.checkOne('_', 1), 'function checkOne works wrong');
         });
 
     });

@@ -94,10 +94,8 @@
     *  Text creationals function
     */
 
-    function writeDown (text) {
-        text = text || this.actualText;
-        this.actualText = text;
-        this.$el.val(text.join(''));
+    function writeDown () {
+        this.$el.val(this.actualText.join(''));
         this.masked = true;
     };
 
