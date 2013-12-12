@@ -4,6 +4,23 @@
             caretMove: true
         },
 
+        defaults = function () {
+            return {
+                actualText: [],
+                charTest: [],
+                placeholders: [],
+                deleteHandler: false,
+                isEntered: false,
+                masked:false,
+                lastSign: 0,
+                firstPosition: undefined,
+                firstCaret: {
+                    begin: 0,
+                    end: 0
+                }
+            };
+        };
+
         _customMask = function () {
             return {
                 isMasked: isMasked,
@@ -187,7 +204,7 @@
         }
 
         if (!e.shiftKey && (button === 39 || button === 40) ) {
-            this.setCaretPosition(this.lastSign + 1);
+            this.setCaretPosition(this.lastSign + this.isEntered);
         }
     };
 
@@ -251,26 +268,13 @@
 
     function maskPlugin (element, mask, options) {
         $.extend(this, _customMask());
+        $.extend(this, defaults());
+
         this.$el = element;
         this.size = mask.length;
         this._maxlengthCash =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
         this.$el.data({maskPlugin: this});
-
-        this.actualText = [];
-        this.charTest = [];
-        this.isEntered = false;
-        this.placeholders = [];
-        this.lastSign = 0;
-        this.masked = false;
-        this.firstPosition = undefined;
-        this.firstCaret = {
-            begin: 0,
-            end: 0
-        };
-        this.deleteHandler = 0;
-        this.masked = false;
-        this.caretMovement = false;
 
         this.maskAnalyse(mask, options.placeholder);
 
