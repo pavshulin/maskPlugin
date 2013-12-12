@@ -45,6 +45,7 @@
                 clearUp: clearUp,
                 fillField: fillField,
                 removeText: removeText,
+                addOne: addOne,
                 addText: addText,
 
                 maskAnalyse: maskAnalyse,
@@ -116,25 +117,26 @@
         this.addText(0, text);
     };
 
+    function addOne (index, char) {
+        this.actualText[index] = char;
+        this.isEntered = true;
+        this.lastSign = index;
+    };
+
     function addText (start, text) {
         var end = text.length,
             n = 0,
             i = start;
 
             while(n < end && !(i >= this.size || !this.isEmptyField(i))) {
-
                 if (!this.isMasked(i)) {
                     if (this.charTest[i].test(text[n])) {
-                        this.actualText[i] = text[n];
-                        this.isEntered = true;
-                        this.lastSign = i;
+                        this.addOne(i, text[n])
                     } else {
                         i--;
                     }
-                    //if not masked position move to next
                     n++;
                 }
-
                 i++;
             }
 
