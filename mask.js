@@ -139,6 +139,7 @@
 
                 i++;
             }
+        console.log(this.lastSign, this.isEntered);
     };
 
     function fillField () {
@@ -152,13 +153,23 @@
     */
 
     function _onFocus () {
+        var caret = this.getCaretPosition();
+
         this.fillField();
         this.setCaretPosition(this.lastSign + 1 || 0);
     };
 
     function _onMouseUp () {
+        var caret = this.getCaretPosition(),
+            position;
         this.fillField();
-        this.setCaretPosition(this.lastSign + 1 || 0);
+
+
+        if(caret.begin === caret.end && caret.begin > this.lastSign) {
+            position = !this.isEntered ? this.firstPosition : this.lastSign + 1 || 0;
+            this.setCaretPosition(position);
+        }
+
     };
 
     function _onDownButtonHandler (event) {
@@ -176,12 +187,12 @@
         }
 
         if (!e.shiftKey && (button === 39 || button === 40) ) {
-            this.setCaretPosition(this.positionChange());
+            this.setCaretPosition(this.lastSign + 1);
         }
     };
 
     function _onChange () {
-        var start = this.firstCaret.begin || this.getCaretPosition().begin,
+        var start = this.firstCaret.begin === undefined ? this.getCaretPosition().begin : this.firstCaret.begin,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
             pos;
@@ -189,11 +200,11 @@
         if (difference > 0) {
             this.addText(start, newText.slice(start, newText.length));
             this.writeDown();
-            pos = this.caretMove(this.lastSign, 1) + 1;
+            pos = this.caretMove(this.lastSign, 1) + !!this.isEntered;
         } else {
             this.removeText(start, newText);
             this.writeDown();
-            pos = this.deleteHandler ? start : (this.lastSign || this.firstPosition) + !!this.isEntered
+            pos = this.deleteHandler ? start : this.lastSign + !!this.isEntered;
         }
 
         this.setCaretPosition(pos);
