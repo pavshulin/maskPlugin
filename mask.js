@@ -19,18 +19,16 @@
                     end: 0
                 }
             };
-        };
+        },
 
         _customMask = function () {
             return {
                 isMasked: isMasked,
                 isEmptyField: isEmptyField,
-                checkOne: checkOne,
 
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 caretMove: caretMove,
-                positionChange: positionChange,
                 
                 writeDown: writeDown,
                 clearUp: clearUp,
@@ -61,10 +59,6 @@
         return this.actualText[index] === this.placeholders[index];
     };
 
-    function checkOne (char, index) {
-        return !(!this.isMasked(index)) || !(this.charTest[index]).test(char)
-    };
-
     /**
     * Caret functions
     */
@@ -85,23 +79,10 @@
         };
     };
 
-    function positionChange () {
-        var start = this.getCaretPosition().begin || this.size;
-
-        if(start < this.lastSign + 1) return start;
-        while (!(start === this.firstPosition || !this.isEmptyField(start))) {
-            start--;
-        }
-
-        return ++start;
-    }
-
-    function caretMove (index, direction) {
-        var stop = direction > 0 ? this.size + 1 : this.firstPosition;
-
-        while (this.isMasked(index + direction)) {
+    function caretMove (index) {
+        while (this.isMasked(index + 1)) {
             index++;
-            if (index === stop) break;
+            if (index === this.size + 1 ) break;
         }
 
         return index;
@@ -142,7 +123,7 @@
             while(n < end && !(i >= this.size || !this.isEmptyField(i))) {
 
                 if (!this.isMasked(i)) {
-                    if(!this.checkOne(text[n], i)) {
+                    if(!(!(!this.isMasked(i)) || !(this.charTest[i]).test(text[n]))) {
                         this.actualText[i] = text[n];
                         this.isEntered = true;
                         this.lastSign = i;
@@ -173,7 +154,7 @@
         var caret = this.getCaretPosition();
 
         this.fillField();
-        this.setCaretPosition(this.lastSign + 1 || 0);
+        this.setCaretPosition(this.lastSign + this.isEntered);
     };
 
     function _onMouseUp () {

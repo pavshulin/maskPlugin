@@ -113,21 +113,5 @@
             ok(!mask.isEmptyField(2), 'function isEmptyField works wrong');
         });
 
-        test("checkOne function test", function () {
-            var input = template.clone(),
-                mask;
-
-            container.append(input);
-
-            input.newMask('999 - 99', {placeholder: '_'});
-            mask = input.data('maskPlugin');
-
-            ok(mask.checkOne, 'function checkOne was not exist');
-
-            ok(mask.checkOne('a', 1), 'function checkOne works wrong');
-            ok(!mask.checkOne('1', 1), 'function checkOne works wrong');
-            ok(mask.checkOne('_', 1), 'function checkOne works wrong');
-        });
-
     });
 } (jQuery));
