@@ -1,4 +1,4 @@
-    (function($) {
+(function($) {
     var customOptioms = {
             placeholder: "_",
             caretMove: true
