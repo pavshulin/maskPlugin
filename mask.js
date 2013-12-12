@@ -38,6 +38,7 @@
 
                 _onFocus: _onFocus,
                 _onMouseUp: _onMouseUp,
+                _onBlur: _onBlur,
                 _onDownButtonHandler: _onDownButtonHandler,
                 _onButtonHandler: _onButtonHandler,
                 _onChange: _onChange,
@@ -99,8 +100,6 @@
 
     function clearUp () {
         this.actualText = this.placeholders.slice();
-
-        this.isEntered = false;
         this.masked = false;
 
         this.$el.val('');
@@ -117,8 +116,7 @@
     function addText (start, text) {
         var end = text.length,
             n = 0,
-            i = start,
-            z = i;
+            i = start;
 
             while(n < end && !(i >= this.size || !this.isEmptyField(i))) {
 
@@ -150,23 +148,23 @@
     */
 
     function _onFocus () {
-        var caret = this.getCaretPosition();
-
         this.fillField();
         this.setCaretPosition(this.lastSign + this.isEntered);
     };
 
-    function _onMouseUp () {
-        var caret = this.getCaretPosition(),
-            position;
-        this.fillField();
-
-
-        if(caret.begin === caret.end && caret.begin > this.lastSign) {
-            position = !this.isEntered ? this.firstPosition : this.lastSign + 1 || 0;
-            this.setCaretPosition(position);
+    function _onBlur () {
+        if (!this.isEntered) {
+            this.clearUp();
         }
 
+    };
+
+    function _onMouseUp () {
+        var caret = this.getCaretPosition();
+
+        if(caret.begin === caret.end && caret.begin > this.lastSign) {
+            this.setCaretPosition(this.lastSign + this.isEntered);
+        }
     };
 
     function _onDownButtonHandler (event) {
@@ -180,35 +178,32 @@
     function _onButtonHandler (e) {
         var button = e.which;
 
-        if(button === 8) {
-        }
-
-        if (!e.shiftKey && (button === 39 || button === 40) ) {
+        if (!e.shiftKey && (button === 35 || button === 39 || button === 40) ) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
     };
 
     function _onChange () {
-        var start = this.firstCaret.begin === undefined ? this.getCaretPosition().begin : this.firstCaret.begin,
+        var start = this.firstCaret.begin === undefined ?
+                this.getCaretPosition().begin : this.firstCaret.begin,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
-            pos;
+            position;
 
         if (difference > 0) {
             this.addText(start, newText.slice(start, newText.length));
-            this.writeDown();
-            pos = this.caretMove(this.lastSign, 1) + !!this.isEntered;
+            position = this.caretMove(this.lastSign, 1) + this.isEntered;
         } else {
             this.removeText(start, newText);
-            this.writeDown();
-            pos = this.deleteHandler ? start : this.lastSign + !!this.isEntered;
+            position = this.deleteHandler ? start : this.lastSign + this.isEntered;
         }
 
-        this.setCaretPosition(pos);
+        this.writeDown();
+        this.setCaretPosition(position);
 
         this.deleteHandler = false;
-        this.firstCaret.begin = undefined;
-        this.firstCaret.end = undefined;
+        delete this.firstCaret.begin;
+        delete this.firstCaret.end;
     };
 
     /**
@@ -261,6 +256,7 @@
         $(this.$el)
             .on('input', this._onChange.bind(this))
             .on('focus', this._onFocus.bind(this))
+            .on('blur', this._onBlur.bind(this))
             .on('mouseup', this._onMouseUp.bind(this))
             .on('keyup', this._onButtonHandler.bind(this))
             .on('keydown', this._onDownButtonHandler.bind(this));
