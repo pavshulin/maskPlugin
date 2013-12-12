@@ -21,6 +21,17 @@
             };
         },
 
+        events = function (_this) {
+            return {
+                _onFocus: _onFocus.bind(_this),
+                _onMouseUp: _onMouseUp.bind(_this),
+                _onBlur: _onBlur.bind(_this),
+                _onDownButtonHandler: _onDownButtonHandler.bind(_this),
+                _onButtonHandler: _onButtonHandler.bind(_this),
+                _onChange: _onChange.bind(_this)
+            };
+        },
+
         _customMask = function () {
             return {
                 isMasked: isMasked,
@@ -36,13 +47,6 @@
                 removeText: removeText,
                 addText: addText,
 
-                _onFocus: _onFocus,
-                _onMouseUp: _onMouseUp,
-                _onBlur: _onBlur,
-                _onDownButtonHandler: _onDownButtonHandler,
-                _onButtonHandler: _onButtonHandler,
-                _onChange: _onChange,
-                
                 maskAnalyse: maskAnalyse,
                 destroy: destroy
             };
@@ -81,9 +85,8 @@
     };
 
     function caretMove (index) {
-        while (this.isMasked(index + 1)) {
+        while (this.isMasked(index + 1) && index !== (this.size + 1)) {
             index++;
-            if (index === this.size + 1 ) break;
         }
 
         return index;
@@ -100,12 +103,12 @@
 
     function clearUp () {
         this.actualText = this.placeholders.slice();
-        this.masked = false;
 
         this.$el.val('');
+        this.masked = false;
     };
 
-    function removeText (start, text) {
+    function removeText (text) {
         this.actualText = this.placeholders.slice();
 
         this.isEntered = false;
@@ -194,7 +197,7 @@
             this.addText(start, newText.slice(start, newText.length));
             position = this.caretMove(this.lastSign, 1) + this.isEntered;
         } else {
-            this.removeText(start, newText);
+            this.removeText(newText);
             position = this.deleteHandler ? start : this.lastSign + this.isEntered;
         }
 
@@ -212,7 +215,14 @@
 
     function destroy () {
         this.$el.attr('maxlength', this._maxlengthCash);
-        this.$el.off('input', this._onChange);
+
+        this.$el
+            .off('input', this._onChange)
+            .off('focus', this._onFocus)
+            .off('blur', this._onBlur)
+            .off('mouseup', this._onMouseUp)
+            .off('keyup', this._onButtonHandler)
+            .off('keydown', this._onDownButtonHandler);
     };
 
     function maskAnalyse (mask, placeholder) {
@@ -242,8 +252,7 @@
     };
 
     function maskPlugin (element, mask, options) {
-        $.extend(this, _customMask());
-        $.extend(this, defaults());
+        $.extend(this, _customMask(), defaults(), events(this));
 
         this.$el = element;
         this.size = mask.length;
@@ -254,12 +263,12 @@
         this.maskAnalyse(mask, options.placeholder);
 
         $(this.$el)
-            .on('input', this._onChange.bind(this))
-            .on('focus', this._onFocus.bind(this))
-            .on('blur', this._onBlur.bind(this))
-            .on('mouseup', this._onMouseUp.bind(this))
-            .on('keyup', this._onButtonHandler.bind(this))
-            .on('keydown', this._onDownButtonHandler.bind(this));
+            .on('input', this._onChange)
+            .on('focus', this._onFocus)
+            .on('blur', this._onBlur)
+            .on('mouseup', this._onMouseUp)
+            .on('keyup', this._onButtonHandler)
+            .on('keydown', this._onDownButtonHandler);
 
         return this;
     };
