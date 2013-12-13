@@ -1,7 +1,9 @@
 (function($) {
     var customOptioms = {
             placeholder: "_",
-            caretMove: true
+            caretMove: true,
+            allwaysMask: true,
+            completed: undefined
         },
 
         defaults = function () {
@@ -13,6 +15,7 @@
                 isEntered: false,
                 masked:false,
                 lastSign: 0,
+                lastSymbol: 0,
                 firstPosition: undefined,
                 firstCaret: {
                     begin: 0,
@@ -40,7 +43,7 @@
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
                 caretMove: caretMove,
-                
+
                 writeDown: writeDown,
                 clearUp: clearUp,
                 fillField: fillField,
@@ -54,8 +57,8 @@
         };
 
     /**
-    * Utils
-    */
+     * Utils
+     */
 
     function isMasked (index) {
         return !this.charTest[index];
@@ -66,8 +69,8 @@
     };
 
     /**
-    * Caret functions
-    */
+     * Caret functions
+     */
 
     function setCaretPosition (begin, end) {
         end = end || begin;
@@ -94,8 +97,8 @@
     };
 
     /**
-    *  Text creationals function
-    */
+     *  Text creationals function
+     */
 
     function writeDown () {
         this.$el.val(this.actualText.join(''));
@@ -103,10 +106,12 @@
     };
 
     function clearUp () {
-        this.actualText = this.placeholders.slice();
+        if (this.allwaysMask) {
+            this.actualText = this.placeholders.slice();
 
-        this.$el.val('');
-        this.masked = false;
+            this.$el.val('');
+            this.masked = false;
+        }
     };
 
     function removeText (text) {
@@ -128,17 +133,21 @@
             n = 0,
             i = start;
 
-            while(n < end && !(i >= this.size || !this.isEmptyField(i))) {
-                if (!this.isMasked(i)) {
-                    if (this.charTest[i].test(text[n])) {
-                        this.addOne(i, text[n])
-                    } else {
-                        i--;
-                    }
-                    n++;
+        while(n < end && !(i >= this.size)) {
+            if (!this.isMasked(i)) {
+                if (this.charTest[i].test(text[n])) {
+                    this.addOne(i, text[n])
+                } else {
+                    i--;
                 }
-                i++;
+                n++;
             }
+            i++;
+        }
+
+        if (this.lastSign === this.lastSymbol && typeof this.completed === 'function') {
+            this.completed();
+        }
 
     };
 
@@ -149,8 +158,8 @@
     };
 
     /**
-    * Event Handlers functions
-    */
+     * Event Handlers functions
+     */
 
     function _onFocus () {
         this.fillField();
@@ -212,8 +221,8 @@
     };
 
     /**
-    * Initialize and destroy functions
-    */
+     * Initialize and destroy functions
+     */
 
     function destroy () {
         this.$el.attr('maxlength', this._maxlengthCash);
@@ -245,6 +254,7 @@
             if (this.firstPosition === undefined) {
                 this.firstPosition = i  ;
             }
+            this.lastSymbol = i;
 
             this.charTest.push(new RegExp($.newMask.definitions[char]));
             this.placeholders.push(placeholder);
@@ -254,6 +264,8 @@
     };
 
     function maskPlugin (element, mask, options) {
+        var text;
+
         $.extend(this, _customMask(), defaults(), events(this));
 
         this.$el = element;
@@ -271,6 +283,15 @@
             .on('mouseup', this._onMouseUp)
             .on('keyup', this._onButtonHandler)
             .on('keydown', this._onDownButtonHandler);
+
+        text = this.$el.val();
+
+        if (text) {
+            this.addText(0, text);
+
+            this.writeDown();
+            this.setCaretPosition(this.caretMove(this.lastSign, 1) + this.isEntered);
+        }
 
         return this;
     };
@@ -300,6 +321,7 @@
 
     $.newMask = {
         definitions: {
+            9: '[0-9]'
         }
     };
 
