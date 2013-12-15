@@ -4,14 +4,13 @@ $(function () {
         inp3 = $('#inp3'),
         inp4 = $('#inp4');
 
-    $.newMask.definitions = {
-        '9': "[0-9]"
-    };
-
-    inp1.newMask('(999) 9999-999', {placeholder: '_'});
-    inp2.newMask('(999) 9999-999', {placeholder: '_'});
-    inp3.newMask('999999', {placeholder: '_'});
-    inp4.newMask('999999-99', {placeholder: '_'});
+    inp1.maskPlugin('(999) 9999-999', {
+        placeholder: '_',
+        completed: function () {alert('a')}
+    });
+    inp2.maskPlugin('(999) 9999-999', {placeholder: '+', allwaysMask: true});
+    inp3.maskPlugin('999999', {placeholder: '_', allwaysMask: true});
+    inp4.maskPlugin('999999-99', {placeholder: '_'});
 
 
     window.masks = {
