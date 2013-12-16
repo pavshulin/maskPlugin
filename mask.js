@@ -50,6 +50,9 @@
                     addOne: addOne,
                     addText: addText,
 
+                    addRegExp: addRegExp,
+                    addToPlaceHolder: addToPlaceHolder,
+                    addSepar: addSepar,
                     maskAnalyse: maskAnalyse,
                     destroy: destroy
                 };
@@ -105,7 +108,7 @@
         };
 
         function clearUp () {
-            if (this.allwaysMask) {
+            if (!this.allwaysMask) {
                 this.actualText = this.placeholders.slice();
 
                 this.$el.val('');
@@ -284,7 +287,7 @@
 
             text = this.$el.val();
 
-            if (text) {
+            if (text || this.allwaysMask) {
                 this.addText(0, text);
 
                 this.writeDown();
@@ -301,12 +304,11 @@
                     maskObj[mask] && maskObj[mask]();
                     return false;
                 }
-                options = $.extend(customOptioms, options);
+                options = $.extend({}, customOptioms, options);
 
-                if (!mask || !mask.length || mask.length <= 0|| $(this).length === 0) return this;
-
-
-                new maskPlugin($(this), mask, options);
+                if (mask && mask.length !== undefined && mask.length > 0 && options.placeholder && options.placeholder.length === 1) {
+                    new maskPlugin($(this), mask, options);    
+                }
 
                 return this;
             })
