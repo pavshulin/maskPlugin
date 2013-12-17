@@ -47,12 +47,8 @@
                     clearUp: clearUp,
                     fillField: fillField,
                     removeText: removeText,
-                    addOne: addOne,
-                    addText: addText,
+                    addToArrays: addToArrays,
 
-                    addRegExp: addRegExp,
-                    addToPlaceHolder: addToPlaceHolder,
-                    addSepar: addSepar,
                     maskAnalyse: maskAnalyse,
                     destroy: destroy
                 };
@@ -237,28 +233,39 @@
                 .off('keydown', this._onDownButtonHandler);
         };
 
+        function addRegExp (char) {
+            this.charTest.push();
+            this.placeholders.push(this.placeholder);
+        };  
+
+        function addToArrays (char, placeholer) {
+            this.charTest.push(char);
+            this.placeholders.push(placeholder);
+        };  
+
         function maskAnalyse (mask) {
             var mask = mask.split(''),
                 maskLength = mask.length,
                 i = 0,
-                char;
+                char,
+                placeholder,
+                method;
 
             for (i; i < maskLength; i++) {
                 char = mask[i];
+                placeholder = false;
 
-                if (!$.maskPlugin.definitions[char]) {
-                    this.charTest.push(false);
-                    this.placeholders.push(char);
-                    continue;
-                }
+                if($.maskPlugin.definitions[char]) {
+                    char = new RegExp($.maskPlugin.definitions[char]);
+                    placeholder = this.placeholder;  
+                }     
+
+                this.addToArrays(char, placeholder);
 
                 if (this.firstPosition === undefined) {
                     this.firstPosition = i  ;
                 }
                 this.lastSymbol = i;
-
-                this.charTest.push(new RegExp($.maskPlugin.definitions[char]));
-                this.placeholders.push(this.placeholder);
             }
 
             this.actualText = this.placeholders.slice();

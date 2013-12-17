@@ -9,7 +9,7 @@ $(function () {
         completed: function () {alert('a')}
     });
     inp2.maskPlugin('(999) 9999-999', {placeholder: '+'});
-    inp3.maskPlugin('999999', {placeholder: '_1', allwaysMask: true});
+    inp3.maskPlugin('999999', {placeholder: '_', allwaysMask: true});
     inp4.maskPlugin('999999-99', {placeholder: '_'});
 
 
