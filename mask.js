@@ -1,8 +1,7 @@
     (function($) {
         var customOptioms = {
                 placeholder: "_",
-                allwaysMask: false,
-                completed: undefined
+                allwaysMask: false
             },
 
             defaults = function () {
@@ -47,6 +46,8 @@
                     clearUp: clearUp,
                     fillField: fillField,
                     removeText: removeText,
+                    addText: addText,
+                    addOne: addOne,
                     addToArrays: addToArrays,
 
                     maskAnalyse: maskAnalyse,
@@ -211,8 +212,8 @@
             delete this.firstCaret.begin;
             delete this.firstCaret.end;
 
-            if (this.lastSign === this.lastSymbol && typeof this.completed === 'function') {
-                this.completed();
+            if (this.lastSign === this.lastSymbol && typeof this.onComplete === 'function') {
+                this.onComplete();
             }
 
         };
@@ -238,7 +239,7 @@
             this.placeholders.push(this.placeholder);
         };  
 
-        function addToArrays (char, placeholer) {
+        function addToArrays (char, placeholder) {
             this.charTest.push(char);
             this.placeholders.push(placeholder);
         };  
@@ -252,11 +253,11 @@
                 method;
 
             for (i; i < maskLength; i++) {
-                char = mask[i];
-                placeholder = false;
+                char = false;
+                placeholder = mask[i];
 
-                if($.maskPlugin.definitions[char]) {
-                    char = new RegExp($.maskPlugin.definitions[char]);
+                if($.maskPlugin.definitions[placeholder]) {
+                    char = new RegExp($.maskPlugin.definitions[placeholder]);
                     placeholder = this.placeholder;  
                 }     
 

@@ -1,22 +1,18 @@
 $(function () {
-    var inp1 = $('#inp1'),
-        inp2 = $('#inp2'),
-        inp3 = $('#inp3'),
-        inp4 = $('#inp4');
+    var phoneOne = $('#phoneOne'),
+        phoneTwo = $('#phoneTwo'),
+        zipCode = $('#zipCode'),
+        postalCode = $('#postalCode');
 
-    inp1.maskPlugin('(999) 9999-999', {
+    phoneOne.maskPlugin('(999) 9999-999', {
         placeholder: '_',
-        completed: function () {alert('a')}
+        onComplete: function () {
+            alert("You've entered phone number!")
+        }
     });
-    inp2.maskPlugin('(999) 9999-999', {placeholder: '+'});
-    inp3.maskPlugin('999999', {placeholder: '_', allwaysMask: true});
-    inp4.maskPlugin('999999-99', {placeholder: '_'});
+    phoneTwo.maskPlugin('(999) 9999-999', {placeholder: '_'});
+    zipCode.maskPlugin('9999999999', {placeholder: '_', allwaysMask: true});
+    postalCode.maskPlugin('99999-9999', {placeholder: '_'});
 
 
-    window.masks = {
-        1: inp1.data('maskPlugin'),
-        2: inp2.data('maskPlugin'),
-        3: inp3.data('maskPlugin'),
-        4: inp4.data('maskPlugin')
-    }
 });
