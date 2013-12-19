@@ -1,7 +1,8 @@
     (function($) {
         var customOptioms = {
                 placeholder: "_",
-                allwaysMask: false
+                allwaysMask: false,
+                clearIncomplete: false
             },
 
             defaults = function () {
@@ -109,6 +110,8 @@
                 this.actualText = this.placeholders.slice();
 
                 this.$el.val('');
+                this.lastSign = this.firstPosition;
+                this.isEntered = false;
                 this.masked = false;
             }
         };
@@ -161,7 +164,7 @@
         };
 
         function _onBlur () {
-            if (!this.isEntered) {
+            if (!this.isEntered || (this.clearIncomplete && this.lastSign < this.lastSymbol)) {
                 this.clearUp();
             }
         };
@@ -234,11 +237,6 @@
                 .off('keydown', this._onDownButtonHandler);
         };
 
-        function addRegExp (char) {
-            this.charTest.push();
-            this.placeholders.push(this.placeholder);
-        };  
-
         function addToArrays (char, placeholder) {
             this.charTest.push(char);
             this.placeholders.push(placeholder);
@@ -249,8 +247,7 @@
                 maskLength = mask.length,
                 i = 0,
                 char,
-                placeholder,
-                method;
+                placeholder;
 
             for (i; i < maskLength; i++) {
                 char = false;
@@ -258,14 +255,15 @@
 
                 if($.maskPlugin.definitions[placeholder]) {
                     char = new RegExp($.maskPlugin.definitions[placeholder]);
-                    placeholder = this.placeholder;  
+                    placeholder = this.placeholder;
+
+                    if (this.firstPosition === undefined) {
+                        this.lastSign =  this.firstPosition = i  ;
+                    }
                 }     
 
                 this.addToArrays(char, placeholder);
 
-                if (this.firstPosition === undefined) {
-                    this.firstPosition = i  ;
-                }
                 this.lastSymbol = i;
             }
 
