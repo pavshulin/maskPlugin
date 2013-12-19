@@ -34,14 +34,14 @@
                     placeholder: '_',
                     testPlaceholders: ['1', '1', '1', '1', '_'],
                     testMask: [ false, false, false, false, numReg],
-                    position: 4
+                    position: 4,
                     last: 4
                 }, {
                     mask: '(09-90',
                     placeholder: '+',
                     testPlaceholders: ['(', '0', '+', '-', '+', '0'],
                     testMask: [ false, false, numReg, false,  numReg, false],
-                    position: 2
+                    position: 2,
                     last: 4
                 }, {
                     mask: '----',
