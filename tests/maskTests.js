@@ -6,12 +6,10 @@
         }),
             container = $('#qunit-fixture'),
                 defs;
-
-        $.newMask.definitions['9'] = "[0-9]";
-        defs = $.newMask.definitions;
+        defs = $.maskPlugin.definitions;
 
         test( "Initialization Test test", function () {
-            ok($.prototype.newMask, "newMask is not exist");
+            ok($.prototype.maskPlugin, "maskPlugin is not exist");
         });
 
         test( "Initialization Test test", function () {
@@ -21,12 +19,12 @@
             container.append(input);
 
 
-            input.newMask('1111', {placeholder: '1'});
+            input.maskPlugin('1111', {placeholder: '1'});
             mask = input.data('maskPlugin')
 
-            ok(mask, 'newMask is created');
+            ok(mask, 'maskPlugin is created');
 
-            input.newMask('destroy');
+            input.maskPlugin('destroy');
         });
 
         test("Mask Analyze function test", function () {
@@ -36,25 +34,27 @@
                     placeholder: '_',
                     testPlaceholders: ['1', '1', '1', '1', '_'],
                     testMask: [ false, false, false, false, numReg],
-                    position: 0
+                    position: 4
+                    last: 4
                 }, {
                     mask: '(09-90',
                     placeholder: '+',
                     testPlaceholders: ['(', '0', '+', '-', '+', '0'],
                     testMask: [ false, false, numReg, false,  numReg, false],
-                    position: 1
+                    position: 2
+                    last: 4
                 }, {
                     mask: '----',
                     placeholder: '+',
                     testPlaceholders: ['-', '-', '-', '-'],
                     testMask: [false, false, false, false],
-                    position: 0
                 }, {
                     mask: '999',
                     placeholder: 'A',
                     testPlaceholders: ['A', 'A', 'A'],
                     testMask: [numReg, numReg, numReg],
-                    position: 2
+                    position: 0,
+                    last: 2
                 }],
                 testInd,
                 test,
@@ -66,13 +66,18 @@
                 test = testDefinitions[testInd];
                 container.append(input);
 
-                input.newMask(test.mask, {placeholder: test.placeholder});
+                input.maskPlugin(test.mask, {placeholder: test.placeholder});
                 mask = input.data('maskPlugin');
 
                 deepEqual(mask.placeholders, test.testPlaceholders);
                 deepEqual(mask.charTest, test.testMask);
+                
+                if(test.position) {
+                    equal(mask.firstPosition, test.position, test.mask) 
+                }
 
-                input.newMask('destroy');
+
+                input.maskPlugin('destroy');
             }
         });
 
@@ -82,7 +87,7 @@
 
             container.append(input);
 
-            input.newMask('999 - 99', {placeholder: '_'});
+            input.maskPlugin('999 - 99', {placeholder: '_'});
             mask = input.data('maskPlugin');
 
             ok(mask.isMasked, 'function isMasked was not exist');
@@ -99,7 +104,7 @@
 
             container.append(input);
 
-            input.newMask('999 - 99', {placeholder: '_'});
+            input.maskPlugin('999 - 99', {placeholder: '_'});
             mask = input.data('maskPlugin');
 
             ok(mask.isEmptyField, 'function isEmptyField was not exist');
