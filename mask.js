@@ -12,6 +12,7 @@
                 placeholders: [],
                 deleteHandler: false,
                 isEntered: false,
+                isMouseUp: false,
                 masked:false,
                 lastSign: 0,
                 lastSymbol: 0,
@@ -27,6 +28,7 @@
             return {
                 _onFocus: _onFocus.bind(_this),
                 _onMouseUp: _onMouseUp.bind(_this),
+                _onMouseDown: _onMouseDown.bind(_this),
                 _onBlur: _onBlur.bind(_this),
                 _onDownButtonHandler: _onDownButtonHandler.bind(_this),
                 _onButtonHandler: _onButtonHandler.bind(_this),
@@ -54,6 +56,10 @@
                 maskAnalyse: maskAnalyse,
                 destroy: destroy
             };
+        },
+        moveButtons = [35, 39, 40],
+        isMoveButton = function (button) {
+            return ~ moveButtons.indexOf(button)
         };
 
     /**
@@ -198,9 +204,7 @@
     };
 
     function _onBlur () {
-        var caret = this.getCaretPosition();
-
-        if(caret.begin < caret.end)console.log('blur'); return true;
+        if(!this.isMouseUp) return true;
 
         if (!this.isEntered || (this.clearIncomplete && this.lastSign < this.lastSymbol)) {
             this.clearUp();
@@ -210,9 +214,15 @@
     function _onMouseUp () {
         var caret = this.getCaretPosition();
 
+        this.isMouseUp = true;
+        
         if(caret.begin === caret.end && caret.begin > this.lastSign) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
+    };
+
+    function _onMouseDown () {
+        this.isMouseUp = false;    
     };
 
     function _onDownButtonHandler (event) {
@@ -223,10 +233,10 @@
         this.deleteHandler = button === 46;
     };
 
-    function _onButtonHandler (e) {
-        var button = e.which;
+    function _onButtonHandler (event) {
+        var button = event.which;
 
-        if (!e.shiftKey && (button === 35 || button === 39 || button === 40) ) {
+        if (!event.shiftKey && isMoveButton(button) ) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
     };
@@ -293,6 +303,7 @@
             .on('focus', this._onFocus)
             .on('blur', this._onBlur)
             .on('mouseup', this._onMouseUp)
+            .on('mousedown', this._onMouseDown)
             .on('keyup', this._onButtonHandler)
             .on('keydown', this._onDownButtonHandler);
 
