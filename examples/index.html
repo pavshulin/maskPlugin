@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>New Mask</title>
+        
         <link rel="stylesheet" href="example.css">
 		<script type="text/javascript" src="../jquery-min.js"></script>
 		<script type="text/javascript" src="../mask.js"></script>
@@ -9,27 +10,32 @@
 
 	</head>	
 	<body>
-        <div class="input-container">
-            <p><b>One Phone mask: '(999) 9999-999'  placeholder: '_'</b></p>
-            <input class="test-input" id="phoneOne" type="text" placeholder="(xxx) xxxx-xxx" />
 
-            <p><b>Two Phone mask: '(999) 9999-999'  placeholder: '_'</b></p>
-            <input class="test-input" id="phoneTwo" type="text" placeholder="(xxx) xxxx-xxx" />
-
-            <p><b>Australia Phone mask: '99 9999 9999'  placeholder: '_'</b></p>
-            <input class="test-input" id="australiaPhone" type="text" placeholder="xx xxxx xxxx" />
-
-            <p><b>zipCode mask: '9999999999'  placeholder: '_'</b></p>
-            <input class="test-input" id="zipCode" type="text" placeholder="xxxxxxxx" />
-
-            <p><b>postalCode: '99999-9999'  placeholder: '_'</b></p>
-            <input class="test-input" id="postalCode" type="text" placeholder="xxxxxx-xx" />
-
-            <input class="test-input" type="text" placeholder="xxxxxx-xx" />
-
-            <input class="test-input" type="text" placeholder="xxxxxx-xx" />
-
-        </div>
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="phoneOne">One Phone mask: <span class="mask-template">'(999) 9999-999'</span>:</label>
+                    <input class="form-control" id="phoneOne" type="text" placeholder="(xxx) xxxx-xxx" />
+                </div>
+                <div class="form-group">    
+                    <label for="phoneTwo">Two Phone mask: <span class="mask-template">'(999) 9999-999'</span>: </label>
+                    <input class="form-control" id="phoneTwo" type="text" placeholder="(xxx) xxxx-xxx" />
+                </div>
+                <div class="form-group">    
+                    <label for="australiaPhone">Australia Phone mask: <span class="mask-template">'99 9999 9999'</span>:</label>
+                    <input class="form-control" id="australiaPhone" type="text" placeholder="xx xxxx xxxx" />
+                </div>
+                <div class="form-group">
+                    <label for="zipCode">zipCode mask: <span class="mask-template">'9999999999'</span>:</label>
+                    <input class="form-control" id="zipCode" type="text" placeholder="xxxxxxxx" />
+                </div>  
+                <div class="form-group">  
+                    <label for="postalCode">postalCode: <span class="mask-template">'99999-9999'</span>:</label>
+                    <input class="form-control" id="postalCode" type="text" placeholder="xxxxxx-xx" />
+                </div>
+            </div>
+        </div>    
 	</body>
 
 </html>

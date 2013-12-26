@@ -21,10 +21,10 @@ $(function () {
         clearIncomplete: true
     });
 
-//    zipCode.maskPlugin('9999999999', {
-//        placeholder: '_',
-//        allwaysMask: true
-//    });
+   zipCode.maskPlugin('9999999999', {
+       placeholder: '_',
+       allwaysMask: true
+   });
 
     postalCode.maskPlugin('99999-9999', {
         placeholder: '_',

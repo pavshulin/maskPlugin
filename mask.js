@@ -12,7 +12,7 @@
                 placeholders: [],
                 deleteHandler: false,
                 isEntered: false,
-                isMouseUp: false,
+                isTextSelected: false,
                 masked:false,
                 lastSign: 0,
                 lastSymbol: 0,
@@ -28,7 +28,8 @@
             return {
                 _onFocus: _onFocus.bind(_this),
                 _onMouseUp: _onMouseUp.bind(_this),
-                _onMouseDown: _onMouseDown.bind(_this),
+                _onBlur: _onMouseDown.bind(_this),
+                _onSelect: _onSelect.bind(_this),
                 _onBlur: _onBlur.bind(_this),
                 _onDownButtonHandler: _onDownButtonHandler.bind(_this),
                 _onButtonHandler: _onButtonHandler.bind(_this),
@@ -64,7 +65,7 @@
 
     /**
      * Utils
-     */
+     **/
 
     function isMasked (index) {
         return !this.charTest[index];
@@ -113,6 +114,7 @@
      */
 
     function setCaretPosition (begin, end) {
+        if (!this.isFocused) return;
         end = end || begin;
 
         this.$el.each(function () {
@@ -147,6 +149,7 @@
 
     function clearUp () {
         if (!this.allwaysMask) {
+            console.log('clear')
             this.actualText = this.placeholders.slice();
 
             this.$el.val('');
@@ -196,39 +199,48 @@
 
     /**
      * Event Handlers functions
-     */
+     **/
 
     function _onFocus () {
         this.fillField();
         this.setCaretPosition(this.lastSign + this.isEntered);
+        this.isFocused = true;
     };
 
     function _onBlur () {
-        if(!this.isMouseUp) return true;
-
         if (!this.isEntered || (this.clearIncomplete && this.lastSign < this.lastSymbol)) {
             this.clearUp();
         }
+
+        this.isTextSelected = false; 
+        this.isFocused = false;
     };
 
     function _onMouseUp () {
         var caret = this.getCaretPosition();
+        console.log(this.isTextSelected, 'up');
 
-        this.isMouseUp = true;
-        
-        if(caret.begin === caret.end && caret.begin > this.lastSign) {
+        if(this.isTextSelected && caret.begin > this.lastSign) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
+
     };
 
-    function _onMouseDown () {
-        this.isMouseUp = false;    
+    function _onMouseDown (event) {
+        this.isTextSelected = false; 
+    };
+
+    function _onSelect (event) {
+        console.log(this.isTextSelected, 'select')
+        this.isTextSelected = true;
+        console.log(this.isTextSelected )
     };
 
     function _onDownButtonHandler (event) {
         var caret = this.getCaretPosition(),
             button = event.which;
 
+        this.isTextSelected = false;    
         this.firstCaret = caret;
         this.deleteHandler = button === 46;
     };
@@ -302,6 +314,7 @@
             .on('input', this._onChange)
             .on('focus', this._onFocus)
             .on('blur', this._onBlur)
+            .on('select', this._onSelect)
             .on('mouseup', this._onMouseUp)
             .on('mousedown', this._onMouseDown)
             .on('keyup', this._onButtonHandler)
