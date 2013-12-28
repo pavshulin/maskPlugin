@@ -1,3 +1,4 @@
+
 (function($) {
     var customOptioms = {
             placeholder: "_",
@@ -10,6 +11,7 @@
                 actualText: [],
                 charTest: [],
                 placeholders: [],
+                cash: {},
                 deleteHandler: false,
                 isEntered: false,
                 isTextSelected: false,
@@ -28,7 +30,7 @@
             return {
                 _onFocus: _onFocus.bind(_this),
                 _onMouseUp: _onMouseUp.bind(_this),
-                _onBlur: _onMouseDown.bind(_this),
+                _onMouseDown: _onMouseDown.bind(_this),
                 _onSelect: _onSelect.bind(_this),
                 _onBlur: _onBlur.bind(_this),
                 _onDownButtonHandler: _onDownButtonHandler.bind(_this),
@@ -41,6 +43,8 @@
             return {
                 isMasked: isMasked,
                 isEmptyField: isEmptyField,
+                addToArrays: addToArrays,
+                maskAnalyse: maskAnalyse,
 
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
@@ -52,9 +56,7 @@
                 removeText: removeText,
                 addText: addText,
                 addOne: addOne,
-                addToArrays: addToArrays,
 
-                maskAnalyse: maskAnalyse,
                 destroy: destroy
             };
         },
@@ -75,7 +77,6 @@
         return this.actualText[index] === this.placeholders[index];
     };
 
-
     function addToArrays (char, placeholder) {
         this.charTest.push(char);
         this.placeholders.push(placeholder);
@@ -88,7 +89,7 @@
             char,
             placeholder;
 
-        for (i; i < maskLength; i++) {
+        for (; i < maskLength; i++) {
             char = false;
             placeholder = mask[i];
 
@@ -149,7 +150,6 @@
 
     function clearUp () {
         if (!this.allwaysMask) {
-            console.log('clear')
             this.actualText = this.placeholders.slice();
 
             this.$el.val('');
@@ -201,10 +201,20 @@
      * Event Handlers functions
      **/
 
-    function _onFocus () {
+    function _onFocus (event) {
+        var _this = this;
         this.fillField();
-        this.setCaretPosition(this.lastSign + this.isEntered);
+
         this.isFocused = true;
+
+
+        setTimeout(function () {
+            _this.fillField();
+            _this.setCaretPosition(_this.lastSign + _this.isEntered);   
+        }, 0);
+
+        event.preventDefault();
+        return false;
     };
 
     function _onBlur () {
@@ -212,35 +222,34 @@
             this.clearUp();
         }
 
-        this.isTextSelected = false; 
         this.isFocused = false;
     };
 
     function _onMouseUp () {
         var caret = this.getCaretPosition();
-        console.log(this.isTextSelected, 'up');
 
-        if(this.isTextSelected && caret.begin > this.lastSign) {
+        if(caret.begin > this.lastSign || (caret.end !== caret.begin && caret.end > this.lastSign + 1)) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
 
     };
 
     function _onMouseDown (event) {
-        this.isTextSelected = false; 
+
+        this.firstCaret = this.getCaretPosition();;
     };
 
     function _onSelect (event) {
-        console.log(this.isTextSelected, 'select')
-        this.isTextSelected = true;
-        console.log(this.isTextSelected )
+        var caret = this.getCaretPosition();
+        if(caret.end > this.lastSign + 1) {
+            this.setCaretPosition(this.lastSign + this.isEntered);
+        }
     };
 
     function _onDownButtonHandler (event) {
         var caret = this.getCaretPosition(),
             button = event.which;
 
-        this.isTextSelected = false;    
         this.firstCaret = caret;
         this.deleteHandler = button === 46;
     };
@@ -258,8 +267,9 @@
                 this.getCaretPosition().begin : this.firstCaret.begin,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
-            position;
-
+            position,
+            buffer;
+        console.log( newText.slice(this.firstCaret.begin, this.firstCaret.begin + (newText.length - this.size)))
         if (difference > 0) {
             this.addText(start, newText.slice(start, newText.length));
             position = this.caretMove(this.lastSign, 1) + this.isEntered;
@@ -286,7 +296,7 @@
      */
 
     function destroy () {
-        this.$el.attr('maxlength', this._maxlengthCash);
+        this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el
             .off('input', this._onChange)
@@ -304,7 +314,7 @@
 
         this.$el = element;
         this.size = mask.length;
-        this._maxlengthCash =  this.$el.attr('maxlength');
+        this.cash.maxlength =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
         this.$el.data({maskPlugin: this});
 
