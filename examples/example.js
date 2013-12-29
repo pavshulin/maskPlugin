@@ -28,9 +28,7 @@
            allwaysMask: true
         });
 
-        postalCode
-    
-        .maskPlugin('99999-9999', {
+        postalCode.maskPlugin('99999-9999', {
             placeholder: '_',
             clearIncomplete: true
         });

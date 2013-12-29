@@ -45,10 +45,14 @@
                 isEmptyField: isEmptyField,
                 addToArrays: addToArrays,
                 maskAnalyse: maskAnalyse,
+                middleChange: middleChange,
+                addingText: addingText,
+                removingText: removingText,
 
                 setCaretPosition: setCaretPosition,
                 getCaretPosition: getCaretPosition,
-                caretMove: caretMove,
+                caretMoveDown: caretMoveDown,
+                caretMove: caretMoveUp,
 
                 writeDown: writeDown,
                 clearUp: clearUp,
@@ -131,7 +135,16 @@
         };
     };
 
-    function caretMove (index) {
+    function caretMoveDown (index) {
+        console.log(index, this.isMasked(index - 1))
+        while (this.isMasked(index - 1) && index !== this.firstPosition) {
+            index--;
+        }
+
+        return index;
+    };
+
+    function caretMoveUp (index) {
         while (this.isMasked(index + 1) && index !== (this.size + 1)) {
             index++;
         }
@@ -171,6 +184,7 @@
         this.actualText[index] = char;
         this.isEntered = true;
         this.lastSign = index;
+        this._isComplete =  this.lastSign === this.lastSymbol;
     };
 
     function addText (start, text) {
@@ -203,7 +217,6 @@
 
     function _onFocus (event) {
         var _this = this;
-        this.fillField();
 
         this.isFocused = true;
 
@@ -222,27 +235,35 @@
             this.clearUp();
         }
 
+
+        this._isTextSelected = false;
         this.isFocused = false;
     };
 
     function _onMouseUp () {
         var caret = this.getCaretPosition();
 
-        if(caret.begin > this.lastSign || (caret.end !== caret.begin && caret.end > this.lastSign + 1)) {
-            this.setCaretPosition(this.lastSign + this.isEntered);
+        if(caret.begin > this.lastSign || 
+            (caret.end !== caret.begin && caret.end > this.lastSign + 1)) {
+            
+            this.setCaretPosition(this.caretMove(this.lastSign) + this.isEntered);
+            return true;
         }
 
+        this.setCaretPosition(this.caretMoveDown(caret.begin));
     };
 
     function _onMouseDown (event) {
-
+        
         this.firstCaret = this.getCaretPosition();;
+    
     };
 
     function _onSelect (event) {
         var caret = this.getCaretPosition();
+
         if(caret.end > this.lastSign + 1) {
-            this.setCaretPosition(this.lastSign + this.isEntered);
+            this.setCaretPosition(this.caretMove(this.lastSign) + this.isEntered);
         }
     };
 
@@ -252,31 +273,81 @@
 
         this.firstCaret = caret;
         this.deleteHandler = button === 46;
+        this.backspaceButton = button === 8;
     };
 
     function _onButtonHandler (event) {
-        var button = event.which;
+        var button = event.which,
+            shiftKey = event.shiftKey;
 
-        if (!event.shiftKey && isMoveButton(button) ) {
+        if(!shiftKey && button === 37) {
+            this.setCaretPosition(
+                this.caretMoveDown(this.getCaretPosition().begin)
+                );
+            return true;
+        }
+ 
+        if (!shiftKey && isMoveButton(button) ) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
     };
 
+    function middleChange (newText, start, buffer) {
+        this.addText(start, newText.slice(start, newText.length));
+
+        return this.caretMove(start - 1 + buffer.length) + 1;
+    };
+
+    function removingText (newText, start) {
+        this.removeText(newText);
+
+        if (this.deleteHandler) {
+            return start;
+        }
+
+        if (this.backspaceButton) {
+            this.backspaceButton = false;
+            return this.caretMoveDown(start - 1);
+        }
+
+        if(start < this.lastSign + 1) {
+            return this.caretMove(start - 1);
+        }
+        
+        return this.lastSign + this.isEntered;
+    };
+
+    function addingText (newText, start) {
+        this.addText(start, newText.slice(start, newText.length));
+        
+        return this.caretMove(this.lastSign) + this.isEntered;
+    };    
+
     function _onChange () {
-        var start = this.firstCaret.begin === undefined ?
-                this.getCaretPosition().begin : this.firstCaret.begin,
+        var caret = this.getCaretPosition(), 
+            start = this.firstCaret.begin === undefined ?
+                caret.begin : this.firstCaret.begin,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
-            position,
-            buffer;
-        console.log( newText.slice(this.firstCaret.begin, this.firstCaret.begin + (newText.length - this.size)))
-        if (difference > 0) {
-            this.addText(start, newText.slice(start, newText.length));
-            position = this.caretMove(this.lastSign, 1) + this.isEntered;
-        } else {
-            this.removeText(newText);
-            position = this.deleteHandler ? start : this.lastSign + this.isEntered;
+            enteredSymbols = newText.slice(this.firstCaret.begin, start + difference),
+            method = 'addingText',
+            position;
+
+        if (this._isComplete && caret.begin === caret.end && difference > 0){
+            this.writeDown();
+            this.setCaretPosition(start);
+            return false;
         }
+        
+        if (difference <= 0) {
+            method = 'removingText';
+        }
+
+        if (this.isEntered && difference > 0 && start < this.caretMove(this.lastSign) + 1) {
+            method = 'middleChange';
+        }
+
+        position = this[method](newText, start, enteredSymbols);
 
         this.writeDown();
         this.setCaretPosition(position);
@@ -285,11 +356,11 @@
         delete this.firstCaret.begin;
         delete this.firstCaret.end;
 
-        if (this.lastSign === this.lastSymbol && typeof this.onComplete === 'function') {
-            this.onComplete();
+        if (this._isComplete) {
+            typeof this.onComplete === 'function' && this.onComplete();
         }
 
-    };
+    };  
 
     /**
      * Initialize and destroy functions
