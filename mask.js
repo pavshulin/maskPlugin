@@ -136,8 +136,11 @@
     };
 
     function caretMoveDown (index) {
-        console.log(index, this.isMasked(index - 1))
-        while (this.isMasked(index - 1) && index !== this.firstPosition) {
+        if (index <= this.firstPosition) {
+            index = this.firstPosition;
+        }
+
+        while (this.isMasked(index - 1) && index > this.firstPosition) {
             index--;
         }
 
@@ -211,6 +214,38 @@
         }
     };
 
+
+    function middleChange (newText, start, buffer) {
+        this.addText(start, newText.slice(start, newText.length));
+
+        return this.caretMove(start - 1 + buffer.length) + 1;
+    };
+
+    function removingText (newText, start) {
+        this.removeText(newText);
+
+        if (this.deleteHandler) {
+            return start;
+        }
+
+        if (this.backspaceButton) {
+            this.backspaceButton = false;
+            return this.caretMoveDown(start - 1);
+        }
+
+        if(start < this.lastSign + 1) {
+            return this.caretMove(start - 1);
+        }
+
+        return this.lastSign + this.isEntered;
+    };
+
+    function addingText (newText, start) {
+        this.addText(start, newText.slice(start, newText.length));
+
+        return this.caretMove(this.lastSign) + this.isEntered;
+    };
+
     /**
      * Event Handlers functions
      **/
@@ -235,7 +270,6 @@
             this.clearUp();
         }
 
-
         this._isTextSelected = false;
         this.isFocused = false;
     };
@@ -250,16 +284,17 @@
             return true;
         }
 
-        this.setCaretPosition(this.caretMoveDown(caret.begin));
+        if(caret.begin < this.lastSign && caret.end === caret.begin) {
+            this.setCaretPosition(this.caretMove(caret.begin - 1) + this.isEntered);
+        }
+
     };
 
-    function _onMouseDown (event) {
-        
-        this.firstCaret = this.getCaretPosition();;
-    
+    function _onMouseDown () {
+        this.firstCaret = this.getCaretPosition();
     };
 
-    function _onSelect (event) {
+    function _onSelect () {
         var caret = this.getCaretPosition();
 
         if(caret.end > this.lastSign + 1) {
@@ -278,50 +313,25 @@
 
     function _onButtonHandler (event) {
         var button = event.which,
-            shiftKey = event.shiftKey;
+            shiftKey = event.shiftKey,
+            caret = this.getCaretPosition();
 
         if(!shiftKey && button === 37) {
             this.setCaretPosition(
-                this.caretMoveDown(this.getCaretPosition().begin)
-                );
+                this.caretMoveDown(caret.begin)
+            );
             return true;
         }
- 
-        if (!shiftKey && isMoveButton(button) ) {
+
+        if (button === 39 && this.getCaretPosition().begin <= this.lastSign) {
+            this.setCaretPosition(this.caretMove(caret.begin) + this.isEntered);
+            return true;
+        }
+
+        if (!shiftKey && isMoveButton(button)) {
             this.setCaretPosition(this.lastSign + this.isEntered);
         }
     };
-
-    function middleChange (newText, start, buffer) {
-        this.addText(start, newText.slice(start, newText.length));
-
-        return this.caretMove(start - 1 + buffer.length) + 1;
-    };
-
-    function removingText (newText, start) {
-        this.removeText(newText);
-
-        if (this.deleteHandler) {
-            return start;
-        }
-
-        if (this.backspaceButton) {
-            this.backspaceButton = false;
-            return this.caretMoveDown(start - 1);
-        }
-
-        if(start < this.lastSign + 1) {
-            return this.caretMove(start - 1);
-        }
-        
-        return this.lastSign + this.isEntered;
-    };
-
-    function addingText (newText, start) {
-        this.addText(start, newText.slice(start, newText.length));
-        
-        return this.caretMove(this.lastSign) + this.isEntered;
-    };    
 
     function _onChange () {
         var caret = this.getCaretPosition(), 
@@ -333,6 +343,10 @@
             method = 'addingText',
             position;
 
+        if (!this.isFocused) {
+           debugger;
+        }
+
         if (this._isComplete && caret.begin === caret.end && difference > 0){
             this.writeDown();
             this.setCaretPosition(start);
@@ -343,7 +357,7 @@
             method = 'removingText';
         }
 
-        if (this.isEntered && difference > 0 && start < this.caretMove(this.lastSign) + 1) {
+        if (this.isEntered && difference > 0 && start < this.lastSign + 1) {
             method = 'middleChange';
         }
 
@@ -360,7 +374,7 @@
             typeof this.onComplete === 'function' && this.onComplete();
         }
 
-    };  
+    };
 
     /**
      * Initialize and destroy functions
