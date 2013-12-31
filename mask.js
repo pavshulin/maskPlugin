@@ -35,7 +35,8 @@
                 _onBlur: _onBlur.bind(_this),
                 _onDownButtonHandler: _onDownButtonHandler.bind(_this),
                 _onButtonHandler: _onButtonHandler.bind(_this),
-                _onChange: _onChange.bind(_this)
+                _onChange: _onChange.bind(_this),
+                focusNavigate: focusNavigate.bind(_this)
             };
         },
 
@@ -155,6 +156,17 @@
         return index;
     };
 
+    function focusNavigate () {
+        this.fillField();
+
+        if(this._isComplete) {
+            this.setCaretPosition(this.firstPosition, this.lastSymbol + 1); 
+            return true;           
+        }
+
+        this.setCaretPosition(this.lastSign + this.isEntered);   
+    }
+
     /**
      *  Text creationals function
      */
@@ -179,6 +191,7 @@
         this.actualText = this.placeholders.slice();
 
         this.isEntered = false;
+        this._isComplete = false;
         this.lastSign = this.firstPosition;
         this.addText(0, text);
     };
@@ -187,7 +200,7 @@
         this.actualText[index] = char;
         this.isEntered = true;
         this.lastSign = index;
-        this._isComplete =  this.lastSign === this.lastSymbol;
+        this._isComplete = this.lastSign === this.lastSymbol;
     };
 
     function addText (start, text) {
@@ -222,6 +235,7 @@
     };
 
     function removingText (newText, start) {
+
         this.removeText(newText);
 
         if (this.deleteHandler) {
@@ -251,15 +265,11 @@
      **/
 
     function _onFocus (event) {
-        var _this = this;
 
         this.isFocused = true;
 
 
-        setTimeout(function () {
-            _this.fillField();
-            _this.setCaretPosition(_this.lastSign + _this.isEntered);   
-        }, 0);
+        setTimeout(this.focusNavigate, 0);
 
         event.preventDefault();
         return false;
