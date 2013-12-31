@@ -157,11 +157,17 @@
     };
 
     function focusNavigate () {
+        var caret = this.getCaretPosition();
         this.fillField();
 
-        if(this._isComplete) {
-            this.setCaretPosition(this.firstPosition, this.lastSymbol + 1); 
-            return true;           
+        if (this._isComplete) {
+            this.setCaretPosition(0, this.lastSymbol + 1);
+            return;
+        }
+
+        if(caret.begin < this.lastSign && caret.end === caret.begin && caret.begin) {
+            this.setCaretPosition(this.caretMove(caret.begin - 1) + this.isEntered);
+            return;
         }
 
         this.setCaretPosition(this.lastSign + this.isEntered);   
@@ -270,9 +276,6 @@
 
 
         setTimeout(this.focusNavigate, 0);
-
-        event.preventDefault();
-        return false;
     };
 
     function _onBlur () {
@@ -291,7 +294,7 @@
             (caret.end !== caret.begin && caret.end > this.lastSign + 1)) {
             
             this.setCaretPosition(this.caretMove(this.lastSign) + this.isEntered);
-            return true;
+            return;
         }
 
         if(caret.begin < this.lastSign && caret.end === caret.begin) {
@@ -330,12 +333,12 @@
             this.setCaretPosition(
                 this.caretMoveDown(caret.begin)
             );
-            return true;
+            return;
         }
 
         if (button === 39 && this.getCaretPosition().begin <= this.lastSign) {
             this.setCaretPosition(this.caretMove(caret.begin) + this.isEntered);
-            return true;
+            return;
         }
 
         if (!shiftKey && isMoveButton(button)) {
@@ -353,14 +356,10 @@
             method = 'addingText',
             position;
 
-        if (!this.isFocused) {
-           debugger;
-        }
-
         if (this._isComplete && caret.begin === caret.end && difference > 0){
             this.writeDown();
             this.setCaretPosition(start);
-            return false;
+            return;
         }
         
         if (difference <= 0) {
@@ -416,14 +415,14 @@
         this.maskAnalyse(mask);
 
         $(this.$el)
-            .on('input', this._onChange)
-            .on('focus', this._onFocus)
-            .on('blur', this._onBlur)
-            .on('select', this._onSelect)
-            .on('mouseup', this._onMouseUp)
-            .on('mousedown', this._onMouseDown)
-            .on('keyup', this._onButtonHandler)
-            .on('keydown', this._onDownButtonHandler);
+            .bind('input.maskPlugin', this._onChange)
+            .bind('focus.maskPlugin', this._onFocus)
+            .bind('blur.maskPlugin', this._onBlur)
+            .bind('select.maskPlugin', this._onSelect)
+            .bind('mouseup.maskPlugin', this._onMouseUp)
+            .bind('mousedown.maskPlugin', this._onMouseDown)
+            .bind('keyup.maskPlugin', this._onButtonHandler)
+            .bind('keydown.maskPlugin', this._onDownButtonHandler);
 
         text = this.$el.val();
 
@@ -450,10 +449,9 @@
                 new maskPlugin($(this), mask, options);
                 $(this).addClass('maskPlugin');
             }
+        });
 
-            return this;
-        })
-
+        return this;
     };
 
     $.fn.extend({
