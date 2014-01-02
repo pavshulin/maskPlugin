@@ -19,7 +19,7 @@
                 lastSign: 0,
                 lastSymbol: 0,
                 firstPosition: undefined,
-                firstCaret: {
+                firstCarriage: {
                     begin: 0,
                     end: 0
                 }
@@ -50,10 +50,10 @@
                 addingText: addingText,
                 removingText: removingText,
 
-                setCaretPosition: setCaretPosition,
-                getCaretPosition: getCaretPosition,
-                caretMoveDown: caretMoveDown,
-                caretMove: caretMoveUp,
+                setCarriagePosition: setCarriagePosition,
+                getCarriagePosition: getCarriagePosition,
+                carriageMoveDown: carriageMoveDown,
+                carriageMove: carriageMoveUp,
 
                 writeDown: writeDown,
                 clearUp: clearUp,
@@ -116,10 +116,10 @@
     };
 
     /**
-     * Caret functions
+     * Carriage functions
      */
 
-    function setCaretPosition (begin, end) {
+    function setCarriagePosition (begin, end) {
         if (!this.isFocused) return;
         end = end || begin;
 
@@ -128,14 +128,14 @@
         });
     }
 
-    function getCaretPosition () {
+    function getCarriagePosition () {
         return {
             begin: this.$el[0].selectionStart,
             end: this.$el[0].selectionEnd
         };
     };
 
-    function caretMoveDown (index) {
+    function carriageMoveDown (index) {
         if (index <= this.firstPosition) {
             index = this.firstPosition;
         }
@@ -147,7 +147,7 @@
         return index;
     };
 
-    function caretMoveUp (index) {
+    function carriageMoveUp (index) {
         if (index >= this.size) {
             index = this.size;
         }
@@ -225,7 +225,7 @@
     function middleChange (newText, start, buffer) {
         this.addText(start, newText.slice(start, newText.length));
 
-        return this.caretMove(start - 1 + buffer.length) + 1;
+        return this.carriageMove(start - 1 + buffer.length) + 1;
     };
 
     function removingText (newText, start) {
@@ -237,11 +237,11 @@
         }
 
         if (this.buttonCode === 8) {
-            return this.caretMoveDown(start - 1 + this.isTextSelected);
+            return this.carriageMoveDown(start - 1 + this.isTextSelected);
         }
 
         if(start < this.lastSign + 1) {
-            return this.caretMove(start + 1);
+            return this.carriageMove(start + 1);
         }
 
         return this.lastSign + this.isEntered;
@@ -250,7 +250,7 @@
     function addingText (newText, start) {
         this.addText(start, newText.slice(start, newText.length));
 
-        return this.caretMove(this.lastSign) + this.isEntered;
+        return this.carriageMove(this.lastSign) + this.isEntered;
     };
 
     /**
@@ -259,24 +259,24 @@
 
 
     function focusNavigate () {
-        var caret = this.getCaretPosition();
+        var carr = this.getCarriagePosition();
         this.fillField();
 
         if (this._isComplete) {
-            this.setCaretPosition(0, this.lastSymbol + 1);
+            this.setCarriagePosition(0, this.lastSymbol + 1);
             return;
         }
 
-        if (caret.begin
-            && caret.end === caret.begin && caret.begin < this.lastSign) {
+        if (carr.begin
+            && carr.end === carr.begin && carr.begin < this.lastSign) {
             
-            this.setCaretPosition(
-                this.caretMove(caret.begin - 1) + this.isEntered
+            this.setCarriagePosition(
+                this.carriageMove(carr.begin - 1) + this.isEntered
                 );
             return;
         }
 
-        this.setCaretPosition(this.lastSign + this.isEntered);   
+        this.setCarriagePosition(this.lastSign + this.isEntered);   
     };
 
 
@@ -297,75 +297,75 @@
     };
 
     function _onMouseUp () {
-        var caret = this.getCaretPosition();
+        var carr = this.getCarriagePosition();
 
-        if(caret.begin > this.lastSign || 
-            (caret.end !== caret.begin && caret.end > this.lastSign + 1)) {
+        if(carr.begin > this.lastSign || 
+            (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
             
-            this.setCaretPosition(this.caretMove(this.lastSign) + this.isEntered);
+            this.setCarriagePosition(this.carriageMove(this.lastSign) + this.isEntered);
             return;
         }
 
-        if(caret.begin < this.lastSign && caret.end === caret.begin) {
-            this.setCaretPosition(this.caretMove(caret.begin - 1) + this.isEntered);
+        if(carr.begin < this.lastSign && carr.end === carr.begin) {
+            this.setCarriagePosition(this.carriageMove(carr.begin - 1) + this.isEntered);
         }
     };
 
     function _onMouseDown () {
-        this.firstCaret = this.getCaretPosition();
+        this.firstCarriage = this.getCarriagePosition();
     };
 
     function _onSelect () {
-        var caret = this.getCaretPosition();
+        var carr = this.getCarriagePosition();
 
-        if(caret.end > this.lastSign + 1) {
-            this.setCaretPosition(this.caretMove(this.lastSign) + this.isEntered);
+        if(carr.end > this.lastSign + 1) {
+            this.setCarriagePosition(this.carriageMove(this.lastSign) + this.isEntered);
         }
         this.isTextSelected = true;
     };
 
     function _onDownButtonHandler (event) {
-        var caret = this.getCaretPosition(),
+        var carr = this.getCarriagePosition(),
             button = event.which;
 
-        this.firstCaret = caret;
+        this.firstCarriage = carr;
         this.buttonCode = button;
     };
 
     function _onButtonHandler (event) {
         var button = event.which,
             shiftKey = event.shiftKey,
-            caret = this.getCaretPosition();
+            carr = this.getCarriagePosition();
 
         if(!shiftKey && button === 37) {
-            this.setCaretPosition(
-                this.caretMoveDown(caret.begin)
+            this.setCarriagePosition(
+                this.carriageMoveDown(carr.begin)
             );
             return;
         }
 
-        if (!shiftKey && button === 39 && caret.begin <= this.lastSign) {
-            this.setCaretPosition(this.caretMove(caret.begin));
+        if (!shiftKey && button === 39 && carr.begin <= this.lastSign) {
+            this.setCarriagePosition(this.carriageMove(carr.begin));
             return;
         }
 
         if (!shiftKey && isMoveButton(button)) {
-            this.setCaretPosition(this.lastSign + this.isEntered);
+            this.setCarriagePosition(this.lastSign + this.isEntered);
         }
     };
 
     function _onChange () {
-        var caret = this.getCaretPosition(), 
-            start = this.firstCaret.begin,
+        var carr = this.getCarriagePosition(), 
+            start = this.firstCarriage.begin,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
             enteredSymbols = newText.slice(start, start + difference),
             method = 'addingText',
             position;
 
-        if (this._isComplete && caret.begin === caret.end && difference > 0){
+        if (this._isComplete && carr.begin === carr.end && difference > 0){
             this.writeDown();
-            this.setCaretPosition(start);
+            this.setCarriagePosition(start);
             return;
         }
         
@@ -380,11 +380,11 @@
         position = this[method](newText, start, enteredSymbols);
 
         this.writeDown();
-        this.setCaretPosition(position);
+        this.setCarriagePosition(position);
 
         this.isTextSelected = false;
         delete this.buttonCode;
-        delete this.firstCaret;
+        delete this.firstCarriage;
 
         if (this._isComplete) {
             typeof this.onComplete === 'function' && this.onComplete();
@@ -437,8 +437,8 @@
             this.addText(0, text);
 
             this.writeDown();
-            this.setCaretPosition(
-                this.caretMove(this.lastSign, 1) + this.isEntered
+            this.setCarriagePosition(
+                this.carriageMove(this.lastSign, 1) + this.isEntered
                 );
         }
 
