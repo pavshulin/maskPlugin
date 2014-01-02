@@ -422,14 +422,14 @@
         this.maskAnalyse(mask);
 
         $(this.$el)
-            .bind('input.maskPlugin', this._onChange)
-            .bind('focus.maskPlugin', this._onFocus)
-            .bind('blur.maskPlugin', this._onBlur)
-            .bind('select.maskPlugin', this._onSelect)
-            .bind('mouseup.maskPlugin', this._onMouseUp)
-            .bind('mousedown.maskPlugin', this._onMouseDown)
-            .bind('keyup.maskPlugin', this._onButtonHandler)
-            .bind('keydown.maskPlugin', this._onDownButtonHandler);
+            .on('input.maskPlugin', this._onChange)
+            .on('focus.maskPlugin', this._onFocus)
+            .on('blur.maskPlugin', this._onBlur)
+            .on('select.maskPlugin', this._onSelect)
+            .on('mouseup.maskPlugin', this._onMouseUp)
+            .on('mousedown.maskPlugin', this._onMouseDown)
+            .on('keyup.maskPlugin', this._onButtonHandler)
+            .on('keydown.maskPlugin', this._onDownButtonHandler);
 
         text = this.$el.val();
 
@@ -476,4 +476,3 @@
     };
 
 })(jQuery);
-
