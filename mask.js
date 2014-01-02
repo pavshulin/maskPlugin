@@ -267,12 +267,12 @@
             return;
         }
 
-        if (carr.begin
-            && carr.end === carr.begin && carr.begin < this.lastSign) {
+        if (carr.begin && carr.end === carr.begin 
+            && carr.begin < this.lastSign) {
             
             this.setCarriagePosition(
                 this.carriageMove(carr.begin - 1) + this.isEntered
-                );
+            );
             return;
         }
 
@@ -302,12 +302,16 @@
         if(carr.begin > this.lastSign || 
             (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
             
-            this.setCarriagePosition(this.carriageMove(this.lastSign) + this.isEntered);
+            this.setCarriagePosition(
+                this.carriageMove(this.lastSign) + this.isEntered
+            );
             return;
         }
 
         if(carr.begin < this.lastSign && carr.end === carr.begin) {
-            this.setCarriagePosition(this.carriageMove(carr.begin - 1) + this.isEntered);
+            this.setCarriagePosition(
+                this.carriageMove(carr.begin - 1) + this.isEntered
+            );
         }
     };
 
@@ -317,9 +321,11 @@
 
     function _onSelect () {
         var carr = this.getCarriagePosition();
-
-        if(carr.end > this.lastSign + 1) {
-            this.setCarriagePosition(this.carriageMove(this.lastSign) + this.isEntered);
+        
+        if(carr.end > this.carriageMove(this.lastSign) + 1) {
+            this.setCarriagePosition(
+                this.carriageMove(this.lastSign) + this.isEntered
+            );
         }
         this.isTextSelected = true;
     };
