@@ -280,7 +280,7 @@
     };
 
 
-    function _onFocus (event) {
+    function _onFocus () {
         this.isFocused = true;
 
         setTimeout(this.focusNavigate, 0);
@@ -368,6 +368,18 @@
             enteredSymbols = newText.slice(start, start + difference),
             method = 'addingText',
             position;
+
+        if (!this.isFocused) {
+            this.removeText(newText);
+            this.writeDown();
+
+            if (!this.isEntered || (this.clearIncomplete
+                && this.lastSign < this.lastSymbol)) {
+                this.clearUp();
+            }
+
+            return;
+        }
 
         if (this._isComplete && carr.begin === carr.end && difference > 0){
             this.writeDown();
