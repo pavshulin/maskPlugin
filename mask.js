@@ -44,11 +44,11 @@
             return {
                 isMasked: isMasked,
                 isEmptyField: isEmptyField,
-                addToArrays: addToArrays,
                 maskAnalyse: maskAnalyse,
                 middleChange: middleChange,
                 addingText: addingText,
                 removingText: removingText,
+                _resetMask: _resetMask,
 
                 setCarriagePosition: setCarriagePosition,
                 getCarriagePosition: getCarriagePosition,
@@ -57,7 +57,6 @@
 
                 writeDown: writeDown,
                 clearUp: clearUp,
-                fillField: fillField,
                 removeText: removeText,
                 addText: addText,
                 addOne: addOne,
@@ -82,11 +81,6 @@
         return this.actualText[index] === this.placeholders[index];
     };
 
-    function addToArrays (char, placeholder) {
-        this.charTest.push(char);
-        this.placeholders.push(placeholder);
-    };
-
     function maskAnalyse (mask) {
         var mask = mask.split(''),
             maskLength = mask.length,
@@ -103,16 +97,15 @@
                 placeholder = this.placeholder;
 
                 if (this.firstPosition === undefined) {
-                    this.lastSign =  this.firstPosition = i  ;
+                    this.firstPosition = i;
                 }
-            }
-
-            this.addToArrays(char, placeholder);
-
+            }        
+            this.charTest.push(char);
+            this.placeholders.push(placeholder);
             this.lastSymbol = i;
         }
 
-        this.actualText = this.placeholders.slice();
+        this._resetMask();
     };
 
     /**
@@ -168,23 +161,22 @@
         this.masked = true;
     };
 
+    function _resetMask () {
+        this.actualText = this.placeholders.slice();
+        this.isEntered = false;
+        this._isComplete = false;
+        this.lastSign = this.firstPosition;
+    };
+
     function clearUp () {
         if (!this.allwaysMask) {
-            this.actualText = this.placeholders.slice();
-
+            this._resetMask();
             this.$el.val('');
-            this.lastSign = this.firstPosition;
-            this.isEntered = false;
-            this.masked = false;
         }
     };
 
     function removeText (text) {
-        this.actualText = this.placeholders.slice();
-
-        this.isEntered = false;
-        this._isComplete = false;
-        this.lastSign = this.firstPosition;
+        this._resetMask();
         this.addText(0, text);
     };
 
@@ -215,12 +207,6 @@
         }
     };
 
-    function fillField () {
-        if (!this.masked) {
-            this.writeDown();
-        }
-    };
-
 
     function middleChange (newText, start, buffer) {
         this.addText(start, newText.slice(start, newText.length));
@@ -241,7 +227,7 @@
         }
 
         if(start < this.lastSign + 1) {
-            return this.carriageMove(start + 1);
+            return this.carriageMove(start || this.firstPosition) + 1;
         }
 
         return this.lastSign + this.isEntered;
@@ -260,7 +246,9 @@
 
     function focusNavigate () {
         var carr = this.getCarriagePosition();
-        this.fillField();
+        if (!this.masked) {
+            this.writeDown();
+        }
 
         if (this._isComplete) {
             this.setCarriagePosition(0, this.lastSymbol + 1);
@@ -405,13 +393,7 @@
     function destroy () {
         this.$el.attr('maxlength', this.cash.maxlength);
 
-        this.$el
-            .off('input', this._onChange)
-            .off('focus', this._onFocus)
-            .off('blur', this._onBlur)
-            .off('mouseup', this._onMouseUp)
-            .off('keyup', this._onButtonHandler)
-            .off('keydown', this._onDownButtonHandler);
+        this.$el.off('.maskPlugin');
     };
 
     function maskPlugin (element, mask, options) {
@@ -451,7 +433,7 @@
         return this;
     };
 
-    function newMask (mask, options) {
+    function MaskPlugin (mask, options) {
         var maskObj = $(this).data('maskPlugin');
         return this.each(function () {
             if (maskObj) {
@@ -472,7 +454,7 @@
     };
 
     $.fn.extend({
-        maskPlugin: newMask
+        maskPlugin: MaskPlugin
     });
 
     $.maskPlugin = {
