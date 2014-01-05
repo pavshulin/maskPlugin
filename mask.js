@@ -172,6 +172,7 @@
         if (!this.allwaysMask) {
             this._resetMask();
             this.$el.val('');
+            this.masked = false;
         }
     };
 
@@ -246,7 +247,8 @@
 
     function focusNavigate () {
         var carr = this.getCarriagePosition();
-        if (!this.masked) {
+        
+        if (!this.masked) {          
             this.writeDown();
         }
 
