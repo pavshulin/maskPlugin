@@ -11,37 +11,45 @@
 
 module.exports = function(grunt) {
 
-  // Project configuration.
   grunt.initConfig({
     jshint: {
-      all: [
-        'mask.js',
-      ],
-      options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        unused: true,
-        boss: true,
-        eqnull: true,
-        node: true,
-        es5: true   
-      }
+      files: {
+        src: ['mask.js']
+      },
+        options: {
+          '-W030': true,
+          curly: true,
+          eqeqeq: true,
+          immed: true,
+          latedef: true,
+          newcap: true,
+          noarg: true,
+          sub: true,
+          undef: true,
+          unused: true,
+          boss: true,
+          eqnull: true,
+          node: true,
+          globals: {
+            jQuery: true
+          } 
+        }
+      
     },
+    qunit: {
+      files: {
+        src: ['tests/test.html']
+      },
+      urls: ['jquery-min.js', 'mask.js']
+    }
   });
 
-  // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
 
-  // "npm test" runs these tasks
-  grunt.registerTask('test', ['jshint']);
+  grunt.registerTask('_jshint', ['jshint']);
+  grunt.registerTask('_qunit', ['qunit']);
 
-  // Default task.
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['_jshint', '_qunit']);
 
 };

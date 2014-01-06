@@ -66,7 +66,7 @@
         },
         moveButtons = [35, 39, 40],
         isMoveButton = function (button) {
-            return ~ moveButtons.indexOf(button)
+            return ~ moveButtons.indexOf(button);
         };
 
     /**
@@ -75,19 +75,18 @@
 
     function isMasked (index) {
         return !this.charTest[index];
-    };
+    }
 
     function isEmptyField (index) {
         return this.actualText[index] === this.placeholders[index];
-    };
+    }
 
     function maskAnalyse (mask) {
-        var mask = mask.split(''),
-            maskLength = mask.length,
+        var maskLength = mask.length,
             i = 0,
             char,
             placeholder;
-
+    
         for (; i < maskLength; i++) {
             char = false;
             placeholder = mask[i];
@@ -106,14 +105,16 @@
         }
 
         this._resetMask();
-    };
+    }
 
     /**
      * Carriage functions
      */
 
     function setCarriagePosition (begin, end) {
-        if (!this.isFocused) return;
+        if (!this.isFocused) {
+            return;
+        }
         end = end || begin;
 
         this.$el.each(function () {
@@ -126,7 +127,7 @@
             begin: this.$el[0].selectionStart,
             end: this.$el[0].selectionEnd
         };
-    };
+    }
 
     function carriageMoveDown (index) {
         if (index <= this.firstPosition) {
@@ -138,7 +139,7 @@
         }
 
         return index;
-    };
+    }
 
     function carriageMoveUp (index) {
         if (index >= this.size) {
@@ -150,7 +151,7 @@
         }
 
         return index;
-    };
+    }
 
     /**
      *  Text creationals function
@@ -159,14 +160,14 @@
     function writeDown () {
         this.$el.val(this.actualText.join(''));
         this.masked = true;
-    };
+    }
 
     function _resetMask () {
         this.actualText = this.placeholders.slice();
         this.isEntered = false;
         this._isComplete = false;
         this.lastSign = this.firstPosition;
-    };
+    }
 
     function clearUp () {
         if (!this.allwaysMask) {
@@ -174,12 +175,12 @@
             this.$el.val('');
             this.masked = false;
         }
-    };
+    }
 
     function removeText (text) {
         this._resetMask();
         this.addText(0, text);
-    };
+    }
 
     function addOne (index, char) {
         this.actualText[index] = char;
@@ -188,17 +189,18 @@
         }
         this.isEntered = true;
         this._isComplete = this.lastSign === this.lastSymbol;
-    };
+    }
+
 
     function addText (start, text) {
         var end = text.length,
             n = 0,
             i = start;
 
-        while(n < end && !(i >= this.size)) {
+        while(n < end && i < this.size) {
             if (!this.isMasked(i)) {
                 if (this.charTest[i].test(text[n])) {
-                    this.addOne(i, text[n])
+                    this.addOne(i, text[n]);
                 } else {
                     i--;
                 }
@@ -206,14 +208,14 @@
             }
             i++;
         }
-    };
+    }
 
 
     function middleChange (newText, start, buffer) {
         this.addText(start, newText.slice(start, newText.length));
 
         return this.carriageMove(start - 1 + buffer.length) + 1;
-    };
+    }
 
     function removingText (newText, start) {
 
@@ -232,13 +234,13 @@
         }
 
         return this.lastSign + this.isEntered;
-    };
+    }
 
     function addingText (newText, start) {
         this.addText(start, newText.slice(start, newText.length));
 
         return this.carriageMove(this.lastSign) + this.isEntered;
-    };
+    }
 
     /**
      * Event Handlers functions
@@ -257,8 +259,8 @@
             return;
         }
 
-        if (carr.begin && carr.end === carr.begin 
-            && carr.begin < this.lastSign) {
+        if (carr.begin && carr.end === carr.begin && 
+            carr.begin < this.lastSign) {
             
             this.setCarriagePosition(
                 this.carriageMove(carr.begin - 1) + this.isEntered
@@ -267,24 +269,24 @@
         }
 
         this.setCarriagePosition(this.lastSign + this.isEntered);   
-    };
+    }
 
 
     function _onFocus () {
         this.isFocused = true;
 
         setTimeout(this.focusNavigate, 0);
-    };
+    }
 
     function _onBlur () {
-        if (!this.isEntered || (this.clearIncomplete 
-            && this.lastSign < this.lastSymbol)) {
+        if (!this.isEntered || (this.clearIncomplete &&
+             this.lastSign < this.lastSymbol)) {
             this.clearUp();
         }
 
         this.isFocused = false;
         this.$el.trigger('change');
-    };
+    }
 
     function _onMouseUp () {
         var carr = this.getCarriagePosition();
@@ -303,11 +305,11 @@
                 this.carriageMove(carr.begin - 1) + this.isEntered
             );
         }
-    };
+    }
 
     function _onMouseDown () {
         this.firstCarriage = this.getCarriagePosition();
-    };
+    }
 
     function _onSelect () {
         var carr = this.getCarriagePosition();
@@ -318,7 +320,7 @@
             );
         }
         this.isTextSelected = true;
-    };
+    }
 
     function _onDownButtonHandler (event) {
         var carr = this.getCarriagePosition(),
@@ -326,7 +328,7 @@
 
         this.firstCarriage = carr;
         this.buttonCode = button;
-    };
+    }
 
     function _onButtonHandler (event) {
         var button = event.which,
@@ -348,7 +350,7 @@
         if (!shiftKey && isMoveButton(button)) {
             this.setCarriagePosition(this.lastSign + this.isEntered);
         }
-    };
+    }
 
     function _onChange () {
         var carr = this.getCarriagePosition(), 
@@ -363,8 +365,8 @@
             this.removeText(newText);
             this.writeDown();
 
-            if (!this.isEntered || (this.clearIncomplete
-                && this.lastSign < this.lastSymbol)) {
+            if (!this.isEntered || (this.clearIncomplete &&
+                 this.lastSign < this.lastSymbol)) {
                 this.clearUp();
             }
 
@@ -394,11 +396,11 @@
         delete this.buttonCode;
         delete this.firstCarriage;
 
-        if (this._isComplete) {
-            typeof this.onComplete === 'function' && this.onComplete();
+        if (this._isComplete && typeof this.onComplete === 'function') {
+             this.onComplete();
         }
 
-    };
+    }
 
     /**
      * Initialize and destroy functions
@@ -408,9 +410,9 @@
         this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el.off('.maskPlugin');
-    };
+    }
 
-    function maskPlugin (element, mask, options) {
+    function MaskPlugin (element, mask, options) {
         var text;
 
         $.extend(this, _customMask(), defaults(), events(this), options);
@@ -421,7 +423,7 @@
         this.$el.removeAttr('maxlength');
         this.$el.data({maskPlugin: this});
 
-        this.maskAnalyse(mask);
+        this.maskAnalyse(mask.split(''));
 
         $(this.$el)
             .on('input.maskPlugin', this._onChange)
@@ -445,9 +447,9 @@
         }
 
         return this;
-    };
+    }
 
-    function MaskPlugin (mask, options) {
+    function maskPlugin (mask, options) {
         var maskObj = $(this).data('maskPlugin');
         return this.each(function () {
             if (maskObj) {
@@ -456,19 +458,17 @@
             }
             options = $.extend({}, customOptioms, options);
 
-            if (mask && mask.length !== undefined && mask.length > 0 
-                && options.placeholder && options.placeholder.length === 1) {
+            if (mask && mask.length !== undefined && mask.length > 0 &&
+                options.placeholder && options.placeholder.length === 1) {
                 
-                new maskPlugin($(this), mask, options);
+                new MaskPlugin($(this), mask, options);
                 $(this).addClass('maskPlugin');
             }
         });
-
-        return this;
-    };
+    }
 
     $.fn.extend({
-        maskPlugin: MaskPlugin
+        maskPlugin: maskPlugin
     });
 
     $.maskPlugin = {
