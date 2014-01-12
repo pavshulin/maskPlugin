@@ -39,8 +39,7 @@ module.exports = function(grunt) {
     qunit: {
       files: {
         src: ['tests/test.html']
-      },
-      urls: ['jquery-min.js', 'mask.js']
+      }
     }
   });
 
