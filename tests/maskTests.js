@@ -140,7 +140,8 @@
     });
 
     test('about replace forbidden symbols', function () {
-
-    });
+        //will implement later
+        ok(true)
+    }); 
 
 } ());
