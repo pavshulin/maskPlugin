@@ -139,9 +139,27 @@
         ok(!mask.isEmptyField(2), 'function isEmptyField works wrong');
     });
 
-    test('about replace forbidden symbols', function () {
-        //will implement later
-        ok(true)
-    }); 
+    test('allwaysMask is working', function () {
+        var input = template.clone(),
+            mask;
 
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_',
+            allwaysMask: true
+        });
+
+        equal(input.val(), '___ - __', 'allwaysMask is work');
+        
+        input.trigger('focus').trigger('blur');
+        
+        equal(input.val(), '___ - __', 'allwaysMask is work');
+
+        input.trigger('focus').val();
+        input.trigger('input').trigger('blur');
+
+        equal(input.val(), '___ - __', 'allwaysMask is work');
+    });
+    
 } ());
