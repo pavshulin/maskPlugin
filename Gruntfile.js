@@ -37,14 +37,22 @@ module.exports = function(grunt) {
       
     },
     qunit: {
-      files: {
-        src: ['tests/test.html']
-      }
+      options: {
+        '--web-security': 'no',
+        coverage: {
+          src: ['mask.js'],
+          instrumentedFiles: 'temp/',
+          coberturaReport: 'report/',
+          htmlReport: 'report/coverage',
+        }
+      },
+      all: ['tests/test.html']
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-qunit-istanbul');
 
   grunt.registerTask('_jshint', ['jshint']);
   grunt.registerTask('_qunit', ['qunit']);
