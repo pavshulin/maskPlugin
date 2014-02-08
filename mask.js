@@ -141,15 +141,17 @@
         return index;
     }
 
-    function carriageMoveUp (index) {
+    function carriageMoveUp (index, isMoved) {
+        var moved = 1 - (!!isMoved + 0);
+
         if (index >= this.size) {
             index = this.size;
         }
 
-        while (this.isMasked(index + 1) && index !== (this.size + 1)) {
+        while (this.isMasked(index + moved) && index !== (this.size + 1)) {
             index++;
         }
-
+        
         return index;
     }
 
@@ -343,7 +345,7 @@
         }
 
         if (!shiftKey && button === 39 && carr.begin <= this.lastSign) {
-            this.setCarriagePosition(this.carriageMove(carr.begin));
+            this.setCarriagePosition(this.carriageMove(carr.begin, true));
             return;
         }
 
@@ -354,12 +356,18 @@
 
     function _onChange () {
         var carr = this.getCarriagePosition(), 
-            start = this.firstCarriage.begin,
+            start = 0,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
-            enteredSymbols = newText.slice(start, start + difference),
             method = 'addingText',
+            enteredSymbols,
             position;
+
+        if(this.firstCarriage && this.firstCarriage.begin) {
+            start = this.firstCarriage.begin;
+        } 
+
+        enteredSymbols = newText.slice(start, start + difference);   
 
         if (!this.isFocused) {
             this.removeText(newText);

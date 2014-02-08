@@ -5,6 +5,7 @@
             phoneTwo = $('#phoneTwo'),
             australiaPhone = $('#australiaPhone'),
             zipCode = $('#zipCode'),
+            date = $('#date'),
             postalCode = $('#postalCode');
 
         phoneOne.maskPlugin('(999) 9999-999', {
@@ -26,6 +27,11 @@
         });
 
         postalCode.maskPlugin('99999-9999', {
+            placeholder: '_',
+            clearIncomplete: true
+        });
+
+        date.maskPlugin('99/99/99', {
             placeholder: '_',
             clearIncomplete: true
         });
