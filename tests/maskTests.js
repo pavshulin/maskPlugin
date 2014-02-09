@@ -162,4 +162,16 @@
         equal(input.val(), '___ - __', 'allwaysMask is work');
     });
     
+    test('allwaysMask is working', function () {
+        var input = template.clone(),
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_',
+            allwaysMask: true
+        });
+    });
+
 } ());

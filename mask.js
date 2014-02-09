@@ -3,7 +3,8 @@
     var customOptioms = {
             placeholder: "_",
             allwaysMask: false,
-            clearIncomplete: false
+            clearIncomplete: false,
+            unmaskedPosition: false
         },
 
         defaults = function () {
@@ -172,7 +173,14 @@
     }
 
     function clearUp () {
+
         if (!this.allwaysMask) {
+            if (this._isAlmostComplete) {
+                this.$el.val(this.actualText.slice(0, this.lastSign + 1).join(''));
+                this.masked = false;    
+                return false;
+            }
+            
             this._resetMask();
             this.$el.val('');
             this.masked = false;
@@ -190,7 +198,6 @@
             this.lastSign = index;
         }
         this.isEntered = true;
-        this._isComplete = this.lastSign === this.lastSymbol;
     }
 
 
@@ -210,6 +217,10 @@
             }
             i++;
         }
+
+        this._isAlmostComplete = (this.unmaskedPosition &&
+            this.unmaskedPosition <= this.lastSign); 
+        this._isComplete = this.lastSign === this.lastSymbol;
     }
 
 
@@ -276,13 +287,13 @@
 
     function _onFocus () {
         this.isFocused = true;
-
+        this.firstCarriage = this.getCarriagePosition();
         setTimeout(this.focusNavigate, 0);
     }
 
     function _onBlur () {
         if (!this.isEntered || (this.clearIncomplete &&
-             this.lastSign < this.lastSymbol)) {
+            !this._isComplete)) {
             this.clearUp();
         }
 

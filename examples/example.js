@@ -3,6 +3,7 @@
     $(function () {
         var phoneOne = $('#phoneOne'),
             phoneTwo = $('#phoneTwo'),
+            phoneWithExt = $('#phoneWithExt'),
             australiaPhone = $('#australiaPhone'),
             zipCode = $('#zipCode'),
             date = $('#date'),
@@ -14,6 +15,12 @@
 
         phoneTwo.maskPlugin('(999) 9999-999', {
             placeholder: '_'
+        });
+
+        phoneWithExt.maskPlugin('(999) 9999-999 x9999', {
+            placeholder: '_',
+            unmaskedPosition: 13,
+            clearIncomplete: true
         });
 
         australiaPhone.maskPlugin('99 9999 9999', {
