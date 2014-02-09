@@ -17,7 +17,7 @@
             placeholder: '_'
         });
 
-        phoneWithExt.maskPlugin('(999) 9999-999 x9999', {
+        phoneWithExt.maskPlugin('(999) 9999-999 x 9999', {
             placeholder: '_',
             unmaskedPosition: 13,
             clearIncomplete: true

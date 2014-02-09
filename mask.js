@@ -132,7 +132,7 @@
 
     function carriageMoveDown (index) {
         if (index <= this.firstPosition) {
-            index = this.firstPosition;
+            return this.firstPosition;
         }
 
         while (this.isMasked(index - 1) && index > this.firstPosition) {
@@ -146,7 +146,7 @@
         var moved = 1 - (!!isMoved + 0);
 
         if (index >= this.size) {
-            index = this.size;
+            return this.size;
         }
 
         while (this.isMasked(index + moved) && index !== (this.size + 1)) {
@@ -287,7 +287,7 @@
 
     function _onFocus () {
         this.isFocused = true;
-        this.firstCarriage = this.getCarriagePosition();
+
         setTimeout(this.focusNavigate, 0);
     }
 

@@ -162,7 +162,7 @@
         equal(input.val(), '___ - __', 'allwaysMask is work');
     });
     
-    test('allwaysMask is working', function () {
+    test('setCarriagePosition is working', function () {
         var input = template.clone(),
             mask;
 
@@ -172,6 +172,136 @@
             placeholder: '_',
             allwaysMask: true
         });
+        mask = input.data('maskPlugin');
+
+        setSel = sinon.stub(input[0], 'setSelectionRange');
+        mask.isFocused = true;
+        mask.setCarriagePosition(0);
+
+        ok(setSel.calledOnce, 'setSel function was not Invoked');
+
+        ok(setSel.calledWith(0, 0), 
+            'setSel function was not received right params');
+
+        mask.setCarriagePosition(1, 2);
+
+        ok(setSel.calledTwice, 'setSel function was not Invoked');
+        ok(setSel.calledWith(1, 2), 
+            'setSel function was not received right params');
+
+        mask.isFocused = false;
+        mask.setCarriagePosition(0);
+        setSel.reset();
+
+        ok(!setSel.calledOnce, 
+            'setSel function was invoked when input is not in isFocused');
     });
 
+      test('getCarriagePosition is working', function () {
+        var input = template.clone(),
+            result,
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_',
+            allwaysMask: true
+        });
+        mask = input.data('maskPlugin');
+
+        result = {
+            begin: mask.$el[0].selectionStart,
+            end: mask.$el[0].selectionEnd
+        }
+        deepEqual(mask.getCarriagePosition(), result, 
+            'getCarriagePosition was return wrong parametrs');
+
+    });
+
+    test('carriageMoveDown is working', function () {
+        var input = template.clone(),
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin('_999 - 99', {
+            placeholder: '_',
+            allwaysMask: true
+        });
+        mask = input.data('maskPlugin');
+
+        equal(mask.carriageMoveDown(10), 9,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(22), 9,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(1), 1,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(0), 1,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(7), 4,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(6), 4,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(5), 4,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(4), 4,
+            'carriageMoveDown is working wrong');
+        equal(mask.carriageMoveDown(8), 8,
+            'carriageMoveDown is working wrong');
+    });
+
+
+    test('carriageMove is working', function () {
+        var input = template.clone(),
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin('!999 - 99!', {
+            placeholder: '_',
+            allwaysMask: true
+        });
+        mask = input.data('maskPlugin');
+
+        equal(mask.carriageMove(0, true), 1,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(1), 1,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(-20), 0,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(-20, true), 1,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(3), 6,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(3, true), 3,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(5, true), 7,
+            'carriageMoveUp is working wrong');
+
+        equal(mask.carriageMove(5), 6,
+            'carriageMoveUp is working wrong');
+
+
+        equal(mask.carriageMove(6, true), 7,
+            'carriageMoveUp is working wrong');
+
+
+        equal(mask.carriageMove(6), 6,
+            'carriageMoveUp is working wrong');
+
+
+        equal(mask.carriageMove(20), 10,
+            'carriageMoveUp is working wrong');
+
+
+        equal(mask.carriageMove(10), 10,
+            'carriageMoveUp is working wrong');
+    });
 } ());
