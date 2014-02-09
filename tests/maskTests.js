@@ -30,12 +30,10 @@
     }
 
     test( "Initialization Test test", function () {
-        ok($.prototype.maskPlugin, "maskPlugin is not exist");
-    });
-
-    test( "Initialization Test test", function () {
         var input = template.clone(),
             mask;
+
+        ok($.prototype.maskPlugin, "maskPlugin is not exist");    
 
         container.append(input);
 
