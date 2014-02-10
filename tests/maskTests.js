@@ -193,6 +193,8 @@
 
         ok(!setSel.calledOnce, 
             'setSel function was invoked when input is not in isFocused');
+
+        setSel.restore();
     });
 
       test('getCarriagePosition is working', function () {
@@ -301,5 +303,88 @@
 
         equal(mask.carriageMove(10), 10,
             'carriageMoveUp is working wrong');
+    });
+
+
+test('_resetMask is working', function () {
+        var input = template.clone(),
+            maskString = '!999 - 99!',
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin(maskString, {
+            placeholder: '_',
+            allwaysMask: true
+        });
+        mask = input.data('maskPlugin');
+
+        mask.actualText = ['!', '1', '2', '3',' ', '-', ' ', '4', '5', '!'];
+        mask.isEntered = true;
+        mask._isComplete = true;
+        mask.lastSign = 5;
+
+        mask._resetMask();
+
+        deepEqual(mask.actualText, mask.placeholders.slice(), 
+            'wrong actual text paramert');
+        equal(mask.isEntered, false, 'wrong isEntered paramert');
+        equal(mask._isComplete, false, 
+            'wrong _isComplete paramert');
+        equal(mask.lastSign, mask.firstPosition, 
+            'wrong lastSign paramert');
+    });
+
+    test('clearUp is working', function () {
+        var input = template.clone(),
+            maskString = '!999 - 99!',
+            buffer = ['!', '1', '2', '3', ' ',
+             '-', ' ', '4', '5', '!'],
+            _resetMask,
+            val,
+            mask;
+
+        container.append(input);
+
+        input.maskPlugin(maskString, {
+            placeholder: '_'
+        });
+        mask = input.data('maskPlugin');
+        mask.masked = true;
+
+        this._isAlmostComplete = false;
+        this.allwaysMask = false;
+
+        _resetMask = sinon.spy(mask, '_resetMask');
+        val = sinon.stub($.prototype, 'val');
+        mask.clearUp();
+
+        ok(_resetMask.calledOnce, 
+            'reset mask function was not invoked');
+        ok(val.calledOnce, 
+            'val function was not invoked');
+        ok(val.calledWith(''), 
+            'val receive wrong paramert');
+        equal(mask.masked, false, 'wrong masked parametr');
+
+        val.reset();
+
+
+        mask.lastSign = 9;
+        mask.masked = true;
+        mask.actualText = buffer;
+        mask._isAlmostComplete = true;
+
+        mask.clearUp();
+        
+        ok(val.calledOnce, 
+            'val function was not invoked');
+        ok(val.calledWith(buffer.join('')), 
+            'val receive wrong paramert');
+        equal(mask.masked, false, 'wrong masked parametr');
+
+        val.restore();
+        _resetMask.restore();
+
     });
 } ());
