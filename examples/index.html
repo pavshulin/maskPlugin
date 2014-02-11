@@ -15,7 +15,7 @@
             <div class="form-inline">
                 <div class="form-group">
                     <label for="phoneOne">One Phone mask: <span class="mask-template">'(999) 9999-999'</span>:</label>
-                    <input class="form-control" id="phoneOne" type="text" placeholder="(xxx) xxxx-xxx" />
+                    <input data-maskOptions-clearIncomlete="true" data-maskOptions-unmaskedPosition="5"  class="form-control" id="phoneOne" type="text" placeholder="(xxx) xxxx-xxx" />
                 </div>
                 <div class="form-group">    
                     <label for="phoneTwo">Two Phone mask: <span class="mask-template">'(999) 9999-999'</span>: </label>
@@ -30,8 +30,16 @@
                     <input class="form-control" id="australiaPhone" type="text" placeholder="xx xxxx xxxx" />
                 </div>
                 <div class="form-group">
-                    <label for="zipCode">zipCode mask: <span class="mask-template">'9999999999'</span>:</label>
-                    <input class="form-control" id="zipCode" type="text" placeholder="xxxxxxxx" />
+                    <label for="zipCode">Zip Code mask: <span class="mask-template">'99999-9999'</span>:</label>
+                    <input class="form-control" id="zipCode" type="text" placeholder="xxxxx-xxxx" />
+                </div>  
+                <div class="form-group">
+                    <label for="tinCode">Tin Code mask: <span class="mask-template">'99-9999999'</span>:</label>
+                    <input class="form-control" id="tinCode" type="text" placeholder="xx-xxxxxxx" />
+                </div>  
+                <div class="form-group">
+                    <label for="npiCode">Npi Code mask: <span class="mask-template">'9999999999'</span>:</label>
+                    <input class="form-control" id="npiCode" type="text" placeholder="xxxxxxxxxx" />
                 </div>  
                 <div class="form-group">  
                     <label for="postalCode">postalCode: <span class="mask-template">'99999-9999'</span>:</label>
