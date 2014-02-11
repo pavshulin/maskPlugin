@@ -434,7 +434,7 @@
     function MaskPlugin (element, mask, options) {
         var text;
 
-        $.extend(this, _customMask(), defaults(), events(this), options);
+        $.extend(this, _customMask(), defaults(), events(this), options); 
 
         this.$el = element;
         this.size = mask.length;
@@ -443,6 +443,8 @@
         this.$el.data({maskPlugin: this});
 
         this.maskAnalyse(mask.split(''));
+        this.unmaskedPosition = (this.unmaskedPosition - 1) >= 
+            this.firstPosition && this.unmaskedPosition - 1;
 
         $(this.$el)
             .on('input.maskPlugin', this._onChange)
