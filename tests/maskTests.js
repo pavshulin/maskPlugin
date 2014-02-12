@@ -163,7 +163,7 @@
         equal(input.val(), '___ - __', 'allwaysMask is work');
     });
     
-    test('setCarriagePosition is working', function () {
+    test('setCarriagePosition function is working', function () {
         var input = template.clone(),
             mask;
 
@@ -200,7 +200,7 @@
         setSel.restore();
     });
 
-      test('getCarriagePosition is working', function () {
+      test('getCarriagePosition function is working', function () {
         var input = template.clone(),
             result,
             mask;
@@ -222,7 +222,7 @@
 
     });
 
-    test('carriageMoveDown is working', function () {
+    test('carriageMoveDown function is working', function () {
         var input = template.clone(),
             mask;
 
@@ -255,7 +255,7 @@
     });
 
 
-    test('carriageMove is working', function () {
+    test('carriageMove function is working', function () {
         var input = template.clone(),
             mask;
 
@@ -309,7 +309,7 @@
     });
 
 
-test('_resetMask is working', function () {
+test('_resetMask function is working', function () {
         var input = template.clone(),
             maskString = '!999 - 99!',
             mask;
@@ -338,7 +338,7 @@ test('_resetMask is working', function () {
             'wrong lastSign paramert');
     });
 
-    test('clearUp is working', function () {
+    test('clearUp function is working', function () {
         var input = template.clone(),
             maskString = '!999 - 99!',
             buffer = ['!', '1', '2', '3', ' ',
@@ -543,11 +543,10 @@ test('_resetMask is working', function () {
         input.val('111').trigger('input');
 
         addText = sinon.stub(mask, 'addText');
-        carriageMove = sinon.stub(mask, 'carriageMove').returns(5   );
+        carriageMove = sinon.stub(mask, 'carriageMove').returns(5);
 
         result = mask.middleChange(['1', '1', '2', '2', '1', '-', ' ', '_', '_'], 2,
             ['2', '2']);
-        
 
         ok(addText.calledOnce, 'addText function was not invoked');
         
@@ -556,11 +555,269 @@ test('_resetMask is working', function () {
 
         ok(carriageMove.calledOnce, 'addText function was not invoked');
         
-        ok(carriageMove.calledWith(3), '');
+        ok(carriageMove.calledWith(3), 
+            'carriageMove was invoked with wrong parametrs');
+
         equal(result, 6);
 
         carriageMove.restore();
         addText.restore();
     });
     
+    test('removingText function is working', function () {
+        var input = template.clone(),
+            _remove,
+            _carriage,
+            testValue = {},
+            testValue1 = {},
+            mask;   
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99 - 99', {
+            placeholder: '_'
+        });
+        mask = input.data('maskPlugin');
+
+        _remove = sinon.stub(mask, 'removeText');
+        _carriageDown = sinon.stub(mask, 'carriageMoveDown').returns(testValue1);
+        _carriage = sinon.stub(mask, 'carriageMove').returns(1);
+
+        mask.buttonCode = 46;
+
+            //cause returned value must be the actually the same not the equal;
+        equal(mask.removingText('some text', testValue), testValue,
+         'function removing text was not return actual paramert');
+        ok(_remove.calledOnce, 'removeText function was not invoked');
+        ok(_remove.calledWith('some text'), 
+            'removeText function was invoked with wrong params');
+
+        mask.buttonCode = 8;
+
+        equal(mask.removingText('some text', 1), testValue1,
+         'function removing text was not return actual paramert');
+        ok(_carriageDown.calledOnce, 'carriageMoveDown function was not invoked');
+        ok(_carriageDown.calledWith(0 + mask.isTextSelected), 
+            'carriageMoveDown function was invoked with wrong params');
+
+        mask.buttonCode = 0;
+        mask.lastSign = 5;
+        mask.firstPosition = 2;
+
+        equal(mask.removingText('some text', 1), 2,
+         'function removingTextving text was not return actual paramert');
+        ok(_carriage.calledOnce, 'carriageMoveDown function was not invoked');
+        ok(_carriage.calledWith(1), 
+            'carriageMoveDown function was invoked with wrong params');
+
+        equal(mask.removingText('some text', 6), 5,
+         'function removing text was not return actual paramert');
+
+        _remove.restore();
+        _carriage.restore();
+        _carriageDown.restore();
+    });
+
+    test('adding text function is working', function () {
+        var input = template.clone(),
+            addText,
+            carriageMove,
+            result,
+            mask;   
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_'
+        });
+
+        mask = input.data('maskPlugin');
+
+        input.val('111').trigger('input');
+
+        addText = sinon.stub(mask, 'addText');
+        carriageMove = sinon.stub(mask, 'carriageMove').returns(5);
+        mask.lastSign = 5;
+        mask.isEntered = true;
+        result = mask.addingText(['1', '1', '2', '2', '1', '-', ' ', '_', '_'],
+         2, ['2', '2']);
+
+        ok(addText.calledOnce, 'addText function was not invoked');
+        
+        ok(addText.calledWith(2, ['2', '2', '1', '-', ' ', '_', '_']),
+            'addText function was invoked with wrong parametrs');
+
+        ok(carriageMove.calledOnce, 'addText function was not invoked');
+        
+        ok(carriageMove.calledWith(mask.lastSign), 
+            'carriageMove was invoked with wrong parametrs');
+        equal(result, 6);
+
+        carriageMove.restore();
+        addText.restore();
+    });
+
+    test('focus navigate function is working', function () {
+        var input = template.clone(),
+            _getCarr,
+            _setCarr,
+            _carrMove,
+            _writeDown,
+            mask;   
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_'
+        });
+
+        mask = input.data('maskPlugin');
+
+        _getCarr = sinon.stub(mask, 'getCarriagePosition');
+        _setCarr = sinon.stub(mask, 'setCarriagePosition');
+        _carrMove = sinon.stub(mask, 'carriageMove');
+        _writeDown = sinon.stub(mask, 'writeDown');
+
+        mask.masked = false;
+        mask._isComplete = true;
+
+        mask.focusNavigate();
+
+        ok(_getCarr.callCount === 1, 'getCarriage function was not invoked');
+        ok(_writeDown.calledOnce, 
+            'writeDown function was not invoked when masked is false');
+        ok(_setCarr.calledOnce, 
+            'set Carriage function was not invoked in case ' + 
+            'of _isComplete false value');
+        ok(_setCarr.calledWith(0, mask.lastSymbol + 1), 
+            'set Carriage function was invoked without actual data' + 
+            'of _isComplete false value');
+
+        mask.masked = true;
+        mask._isComplete = false;
+        mask.lastSign = 7;
+        _getCarr.returns({
+            begin: 1,
+            end: 1
+        });
+        _carrMove.returns(100);
+        mask.isEntered = true;
+
+        _writeDown.reset();
+        _setCarr.reset();
+
+        mask.focusNavigate();
+
+        ok(_getCarr.callCount === 2, 'getCarriage function was not invoked');
+        ok(!_writeDown.calledOnce, 
+            'writeDown function was invoked when masked is true');
+        ok(_setCarr.calledOnce, 
+            'set Carriage function was not invoked in case ' + 
+            'of carriage is taked place before last entered symbols');
+        ok(_setCarr.calledWith(101), 
+            'set Carriage function was invoked without actual data' + 
+            'of carriage is taked place before last entered symbols');
+        ok(_carrMove.calledOnce, 
+            'Carriage Move function was not invoked in case ' + 
+            'of carriage is taked place before last entered symbols');
+        ok(_carrMove.calledWith(0), 
+            'Carriage Move function was invoked without actual data' + 
+            'of carriage is taked place before last entered symbols');
+
+        mask.lastSign = 2;
+        _getCarr.returns({
+            begin: 3,
+            end: 3
+        });
+        mask.isEntered = true;
+
+        _setCarr.reset();
+
+        mask.focusNavigate();
+
+        ok(_getCarr.callCount === 3, 'getCarriage function was not invoked');
+        ok(_setCarr.calledOnce, 
+            'set Carriage function was not invoked in case ' + 
+            'when carriage was taked place after last symbol');
+        ok(_setCarr.calledWith(mask.lastSign + mask.isEntered), 
+            'set Carriage function was invoked without actual data' + 
+            'when carriage was taked place after last symbol'); 
+
+        _getCarr.restore();
+        _setCarr.restore();
+        _carrMove.restore();
+        _writeDown.restore();     
+    });
+
+test('_onFocus function is working', function () {
+        var input = template.clone(),
+            setTimeout = sinon.stub(window, 'setTimeout'),
+            mask;   
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_'
+        });
+
+        mask = input.data('maskPlugin');  
+        mask.isFocused = false;
+
+        mask._onFocus();
+
+        ok(mask.isFocused, 'isFocused paramert was not changed');
+        ok(setTimeout.calledOnce, 'setTimeout was not invoked');
+        ok(setTimeout.calledWith(mask.focusNavigate, 0),
+            'setTimeout was invoked with wrong parametrs');
+
+        setTimeout.restore();
+    });
+
+    test('_onBlur function is working', function () {
+        var input = template.clone(),
+            _clearUp,
+            _trigger,
+            mask;   
+
+        container.append(input);
+
+        input.maskPlugin('999 - 99', {
+            placeholder: '_'
+        });
+
+        mask = input.data('maskPlugin'); 
+        _trigger = sinon.stub(mask.$el, 'trigger');
+        _clearUp = sinon.stub(mask, 'clearUp');
+        mask.clearIncomplete = false;
+        mask.isEntered = false;
+
+        mask._onBlur();
+
+        ok(!mask.isFocused, 'wrong isFocused attribute');
+        ok(_trigger.calledOnce, 'trigger function was not invoked');
+        ok(_trigger.calledWith('change'), 
+            'trigger function was invoked with wrong attr');
+        ok(_clearUp.calledOnce, 
+            'function clearUp was not invoked when isEntered is false');
+
+        mask.clearIncomplete = true;
+        mask._isComplete = false;
+        mask.isEntered = true;
+        mask.isFocused = true;
+        _trigger.reset();
+
+        mask._onBlur();
+
+        ok(!mask.isFocused, 'wrong isFocused attribute');
+        ok(_trigger.calledOnce, 'trigger function was not invoked');
+        ok(_trigger.calledWith('change'), 
+            'trigger function was invoked with wrong attr');
+        ok(_clearUp.calledTwice, 
+            'function clearUp was not invoked when clearIncomplete was true' + 
+                'and _isComplete was false');
+
+        _clearUp.restore();
+        _trigger.restore();
+    });
+
 } ());
