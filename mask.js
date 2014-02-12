@@ -104,6 +104,8 @@
             this.placeholders.push(placeholder);
             this.lastSymbol = i;
         }
+        
+        this.firstPosition = this.firstPosition || 0; 
 
         this._resetMask();
     }
