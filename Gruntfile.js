@@ -40,15 +40,18 @@ module.exports = function(grunt) {
       options: {
         '--web-security': 'no',
         coverage: {
-          src: ['mask.js'],
+          src: [
+            'mask.js', 
+            'tests/openMask.js'
+          ],
           instrumentedFiles: 'temp/',
           coberturaReport: 'report/',
           htmlReport: 'report/coverage',
         }
       },
       all: [
-        'tests/internalTest.html',
-        'tests/test.html'
+        'tests/test.html',
+        'tests/internalTest.html'
         ]
     }
   });

@@ -432,7 +432,7 @@
         this.destroy().maskPlugin(mask, options);
     }  
 
-    function destroy () {
+    function _destroy () {
         this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el.off('.maskPlugin');
@@ -440,7 +440,7 @@
         this.$el.data('maskPlugin', null);
         $.each(this, function (property) {
             if (this.hasOwnProperty(property)) {
-                delete this[property]   
+                delete this[property];   
             }
 
         }.bind(this));
@@ -456,10 +456,7 @@
         this.size = mask.length;
         this.cash.maxlength =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
-        this.$el.data('maskPlugin', {
-            reset: this._reset.bind(this),
-            destroy: this._destroy.bind(this)
-        });
+        this.$el.data('maskPlugin', this);
 
         this.maskAnalyse(mask.split(''));
         this.unmaskedPosition = (this.unmaskedPosition - 1) >= 

@@ -440,7 +440,7 @@
         this.$el.data('maskPlugin', null);
         $.each(this, function (property) {
             if (this.hasOwnProperty(property)) {
-                delete this[property]   
+                delete this[property];   
             }
 
         }.bind(this));
