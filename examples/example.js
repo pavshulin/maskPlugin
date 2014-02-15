@@ -11,9 +11,9 @@
             date = $('#date'),
             postalCode = $('#postalCode');tinCode
   
-        phoneOne.val('112312').maskPlugin('(999) 9999-999', {
+        phoneOne.maskPlugin('(999) 9999-999', {
             placeholder: '_'
-        }).focus();
+        });
 
         phoneTwo.maskPlugin('(999) 9999-999', {
             placeholder: '_'
