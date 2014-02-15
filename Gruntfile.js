@@ -14,7 +14,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     jshint: {
       files: {
-        src: ['mask.js']
+        src: ['mask.js', 'test/openMask.js']
       },
         options: {
           '-W030': true,
@@ -46,7 +46,10 @@ module.exports = function(grunt) {
           htmlReport: 'report/coverage',
         }
       },
-      all: ['tests/test.html']
+      all: [
+        'tests/internalTest.html',
+        'tests/test.html'
+        ]
     }
   });
 

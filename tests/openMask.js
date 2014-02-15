@@ -432,7 +432,7 @@
         this.destroy().maskPlugin(mask, options);
     }  
 
-    function _destroy () {
+    function destroy () {
         this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el.off('.maskPlugin');
