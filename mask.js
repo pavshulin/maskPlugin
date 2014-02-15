@@ -431,6 +431,15 @@
         this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el.off('.maskPlugin');
+        this.$el.removeClass('maskPlugin');
+        this.$el.data('maskPlugin', null);
+        $.each(this, function (property) {
+            if (this.hasOwnProperty(property)) {
+                delete this[property]   
+            }
+
+        }.bind(this));
+     
     }
 
     function MaskPlugin (element, mask, options) {
@@ -442,7 +451,7 @@
         this.size = mask.length;
         this.cash.maxlength =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
-        this.$el.data({maskPlugin: this});
+        this.$el.data('maskPlugin', this);
 
         this.maskAnalyse(mask.split(''));
         this.unmaskedPosition = (this.unmaskedPosition - 1) >= 
@@ -477,7 +486,7 @@
         return this.each(function () {
             if (maskObj) {
                 maskObj[mask] && maskObj[mask]();
-                return false;
+                return this;
             }
             options = $.extend({}, customOptioms, options);
 
