@@ -37,6 +37,7 @@
                 _onDownButtonHandler: _onDownButtonHandler.bind(_this),
                 _onButtonHandler: _onButtonHandler.bind(_this),
                 _onChange: _onChange.bind(_this),
+                _onComplete: _onComplete.bind(_this),
                 focusNavigate: focusNavigate.bind(_this)
             };
         },
@@ -58,6 +59,7 @@
 
                 writeDown: writeDown,
                 clearUp: clearUp,
+                _clearUpCheck: _clearUpCheck,
                 removeText: removeText,
                 addText: addText,
                 addOne: addOne,
@@ -175,8 +177,14 @@
         this.lastSign = this.firstPosition;
     }
 
-    function clearUp () {
+    function _clearUpCheck () {
+        if (!this.isEntered || (this.clearIncomplete &&
+            !this._isComplete)){
+            this.clearUp();
+        }
+    }
 
+    function clearUp () {
         if (!this.allwaysMask) {
             if (this._isAlmostComplete) {
                 this.$el.val(this.actualText.slice(0, this.lastSign + 1).join(''));
@@ -295,10 +303,7 @@
     }
 
     function _onBlur () {
-        if (!this.isEntered || (this.clearIncomplete &&
-            !this._isComplete)) {
-            this.clearUp();
-        }
+        this._clearUpCheck();
 
         this.isFocused = false;
         this.$el.trigger('change');
@@ -368,6 +373,15 @@
         }
     }
 
+    function _onComplete () {
+        var newText = this.$el.val();
+        this.removeText(newText);
+        this.writeDown();
+
+        this._clearUpCheck();
+
+    }
+
     function _onChange () {
         var carr = this.getCarriagePosition(), 
             start = 0,
@@ -384,14 +398,7 @@
         enteredSymbols = newText.slice(start, start + difference);   
 
         if (!this.isFocused) {
-            this.removeText(newText);
-            this.writeDown();
-
-            if (!this.isEntered || (this.clearIncomplete &&
-                 this.lastSign < this.lastSymbol)) {
-                this.clearUp();
-            }
-
+            this._onComplete();
             return;
         }
 
@@ -468,6 +475,7 @@
         $(this.$el)
             .on('input.maskPlugin', this._onChange)
             .on('focus.maskPlugin', this._onFocus)
+            .on('change.maskPlugin', this._onComplete)
             .on('blur.maskPlugin', this._onBlur)
             .on('select.maskPlugin', this._onSelect)
             .on('mouseup.maskPlugin', this._onMouseUp)
