@@ -64,7 +64,7 @@
                 addText: addText,
                 addOne: addOne,
 
-                 _reset: _reset,   
+                _reset: _reset,
                 _destroy: _destroy
             };
         },
@@ -90,7 +90,7 @@
             i = 0,
             char,
             placeholder;
-    
+
         for (; i < maskLength; i++) {
             char = false;
             placeholder = mask[i];
@@ -102,13 +102,13 @@
                 if (this.firstPosition === undefined) {
                     this.firstPosition = i;
                 }
-            }        
+            }
             this.charTest.push(char);
             this.placeholders.push(placeholder);
             this.lastSymbol = i;
         }
-        
-        this.firstPosition = this.firstPosition || 0; 
+
+        this.firstPosition = this.firstPosition || 0;
 
         this._resetMask();
     }
@@ -157,7 +157,7 @@
         while (this.isMasked(index + moved) && index !== (this.size + 1)) {
             index++;
         }
-        
+
         return index;
     }
 
@@ -188,10 +188,10 @@
         if (!this.allwaysMask) {
             if (this._isAlmostComplete) {
                 this.$el.val(this.actualText.slice(0, this.lastSign + 1).join(''));
-                this.masked = false;    
+                this.masked = false;
                 return false;
             }
-            
+
             this._resetMask();
             this.$el.val('');
             this.masked = false;
@@ -230,7 +230,7 @@
         }
 
         this._isAlmostComplete = (this.unmaskedPosition &&
-            this.unmaskedPosition <= this.lastSign); 
+            this.unmaskedPosition <= this.lastSign);
         this._isComplete = this.lastSign === this.lastSymbol;
     }
 
@@ -273,8 +273,8 @@
 
     function focusNavigate () {
         var carr = this.getCarriagePosition();
-        
-        if (!this.masked) {          
+
+        if (!this.masked) {
             this.writeDown();
         }
 
@@ -283,16 +283,16 @@
             return;
         }
 
-        if (carr.begin && carr.end === carr.begin && 
+        if (carr.begin && carr.end === carr.begin &&
             carr.begin < this.lastSign) {
-            
+
             this.setCarriagePosition(
                 this.carriageMove(carr.begin - 1) + this.isEntered
             );
             return;
         }
 
-        this.setCarriagePosition(this.lastSign + this.isEntered);   
+        this.setCarriagePosition(this.lastSign + this.isEntered);
     }
 
 
@@ -306,15 +306,15 @@
         this._clearUpCheck();
 
         this.isFocused = false;
-        this.$el.trigger('change');
+        this._onChange();
     }
 
     function _onMouseUp () {
         var carr = this.getCarriagePosition();
 
-        if(carr.begin > this.lastSign || 
+        if(carr.begin > this.lastSign ||
             (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
-            
+
             this.setCarriagePosition(
                 this.carriageMove(this.lastSign) + this.isEntered
             );
@@ -334,7 +334,7 @@
 
     function _onSelect () {
         var carr = this.getCarriagePosition();
-        
+
         if(carr.end > this.carriageMove(this.lastSign) + 1) {
             this.setCarriagePosition(
                 this.carriageMove(this.lastSign) + this.isEntered
@@ -383,7 +383,7 @@
     }
 
     function _onChange () {
-        var carr = this.getCarriagePosition(), 
+        var carr = this.getCarriagePosition(),
             start = 0,
             newText = this.$el.val().split(''),
             difference = newText.length - this.size,
@@ -393,9 +393,9 @@
 
         if(this.firstCarriage && this.firstCarriage.begin) {
             start = this.firstCarriage.begin;
-        } 
+        }
 
-        enteredSymbols = newText.slice(start, start + difference);   
+        enteredSymbols = newText.slice(start, start + difference);
 
         if (!this.isFocused) {
             this._onComplete();
@@ -407,7 +407,7 @@
             this.setCarriagePosition(start);
             return;
         }
-        
+
         if (difference <= 0) {
             method = 'removingText';
         }
@@ -426,7 +426,7 @@
         delete this.firstCarriage;
 
         if (this._isComplete && typeof this.onComplete === 'function') {
-             this.onComplete();
+            this.onComplete();
         }
 
     }
@@ -437,7 +437,7 @@
 
     function _reset (mask, options) {
         this.destroy().maskPlugin(mask, options);
-    }  
+    }
 
     function _destroy () {
         this.$el.attr('maxlength', this.cash.maxlength);
@@ -447,17 +447,17 @@
         this.$el.data('maskPlugin', null);
         $.each(this, function (property) {
             if (this.hasOwnProperty(property)) {
-                delete this[property];   
+                delete this[property];
             }
 
         }.bind(this));
-     
+
     }
 
     function MaskPlugin (element, mask, options) {
         var text;
 
-        $.extend(this, _customMask(), defaults(), events(this), options); 
+        $.extend(this, _customMask(), defaults(), events(this), options);
 
         this.$el = element;
         this.size = mask.length;
@@ -469,7 +469,7 @@
         });
 
         this.maskAnalyse(mask.split(''));
-        this.unmaskedPosition = (this.unmaskedPosition - 1) >= 
+        this.unmaskedPosition = (this.unmaskedPosition - 1) >=
             this.firstPosition && this.unmaskedPosition - 1;
 
         $(this.$el)
@@ -491,7 +491,7 @@
             this.writeDown();
             this.setCarriagePosition(
                 this.carriageMove(this.lastSign, 1) + this.isEntered
-                );
+            );
         }
 
         return this;
@@ -509,7 +509,7 @@
 
             if (mask && mask.length !== undefined && mask.length > 0 &&
                 options.placeholder && options.placeholder.length === 1) {
-                
+
                 new MaskPlugin($(this), mask, options);
                 $(this).addClass('maskPlugin');
             }
