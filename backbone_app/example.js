@@ -22,13 +22,22 @@
             id: 'phoneTwo'
         }],
         watcherModel = Backbone.Model.extend({
-            default: {
+
+            initialize: function () {
+                this.on('change:value', this.validate, this);
+            },
+
+            defaults: {
                 value: ''
+            },
+
+            validate: function (value) {
+                debugger;
             }
-        })
+        }),
         maskModel = Backbone.Model.extend({
 
-            default: {
+            defaults: {
                 mask: '',
                 maskOptions: {},
                 label: '',
@@ -45,7 +54,14 @@
 
         maskView = Backbone.View.extend({
             initialize: function () {
-                this.template = _.template($('#mask-template').html());
+                this.template = _.template($('#mask-template').html()); 
+                this._watch = new watcherModel();
+                
+                // Backbone.ModelBinder.SetOptions({
+                //     modelSetOptions: {
+                //         validate: true
+                //     }
+                // });
 
                 this._modelBinder = new Backbone.ModelBinder();
             },
@@ -55,17 +71,19 @@
                     selector = '#' + _model.id;
 
                 this.$el.html(this.template(_model));
-                this._modelBinder.bind(this.model, this.$el);
+                this._modelBinder.bind(this._watch, this.$el, maskView.Bindings);
                 this.$(selector).maskPlugin(_model.mask, _model.maskOptions)
                 return this;
             }
-        }, Bindings: {
-            value: {
-                selector: '[name=value]',
-                converter: function (dir, value) {
-                    return value;
+        }, {
+            Bindings: {
+                value: {
+                    selector: '[name=value]',
+                    converter: function (dir, value) {
+                        return value;
+                    }
                 }
-            }
+            }    
         }),
 
         appView = Backbone.View.extend({

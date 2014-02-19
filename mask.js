@@ -305,7 +305,7 @@
         this._clearUpCheck();
 
         this.isFocused = false;
-        this._onChange();
+        this._onComplete();
     }
 
     function _onMouseUp () {
@@ -378,8 +378,11 @@
 
     function _onComplete () {
         var newText = this.$el.val();
-        this.removeText(newText);
-        this.writeDown();
+
+        if (newText !== this.actualText.join('')) {
+            this.removeText(newText);
+            this.writeDown();    
+        }
 
         this._clearUpCheck();
 
