@@ -57,6 +57,13 @@
                 this.template = _.template($('#mask-template').html()); 
                 this._watch = new watcherModel();
                 
+                this._ev = [
+                    'change',
+                    'focus',
+                    'blur',
+                    'input'
+                ];
+
                 // Backbone.ModelBinder.SetOptions({
                 //     modelSetOptions: {
                 //         validate: true
@@ -68,11 +75,21 @@
 
             render: function () {
                 var _model = this.model.toJSON(),
-                    selector = '#' + _model.id;
+                    selector;
 
                 this.$el.html(this.template(_model));
+                selector = this.$('#' + _model.id);
+                
+
+                _.each(this._ev, function (ev) {
+                     selector.on(ev, function () {
+                        console.log('trigger ' + ev);
+                     })
+                }, this);    
+
+
                 this._modelBinder.bind(this._watch, this.$el, maskView.Bindings);
-                this.$(selector).maskPlugin(_model.mask, _model.maskOptions)
+                selector.maskPlugin(_model.mask, _model.maskOptions)
                 return this;
             }
         }, {
@@ -89,11 +106,11 @@
         appView = Backbone.View.extend({
             initialize: function () {
                 this.Masks = new maskCollection ();
-
-                this._renderMasks();
             },
 
             render: function () {
+                this._renderMasks();
+
                 return this;
             },
 

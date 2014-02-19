@@ -149,7 +149,7 @@
     function carriageMoveUp (index, isMoved) {
         var moved = 1 - (!!isMoved + 0);
 
-        if (index > this.size) {
+        if (index >= this.size) {
             return this.size;
         }
 
@@ -297,7 +297,7 @@
 
     function _onFocus () {
         this.isFocused = true;
-
+        this._firstState = this.$el.val();
         setTimeout(this.focusNavigate, 0);
     }
 
@@ -306,6 +306,10 @@
 
         this.isFocused = false;
         this._onComplete();
+
+        if (this._firstState !== this.$el.val()) {
+            this.$el.trigger('change');   
+        }
     }
 
     function _onMouseUp () {
