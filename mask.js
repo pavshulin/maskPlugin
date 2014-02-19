@@ -446,7 +446,11 @@
      */
 
     function _reset (mask, options) {
-        this.destroy().maskPlugin(mask, options);
+        var $el = this.$el;
+
+        this._destroy();
+
+        return $el.maskPlugin(mask, options);
     }
 
     function _destroy () {
@@ -461,7 +465,6 @@
             }
 
         }.bind(this));
-
     }
 
     function MaskPlugin (element, mask, options) {
@@ -508,12 +511,11 @@
     }
 
     function maskPlugin (mask, options) {
-        var _arguments = arguments,
-            maskObj = $(this).data('maskPlugin');
+        var maskObj = $(this).data('maskPlugin');
+        
         return this.each(function () {
             if (maskObj) {
-                maskObj[mask] && maskObj[mask](_arguments);
-                return this;
+                this.data('maskPlugin').reset(mask, options);
             }
             options = $.extend({}, customOptioms, options);
 
