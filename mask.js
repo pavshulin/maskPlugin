@@ -1,4 +1,3 @@
-
 (function($) {
     var customOptioms = {
             placeholder: "_",
@@ -150,7 +149,7 @@
     function carriageMoveUp (index, isMoved) {
         var moved = 1 - (!!isMoved + 0);
 
-        if (index >= this.size) {
+        if (index > this.size) {
             return this.size;
         }
 
@@ -325,6 +324,7 @@
             this.setCarriagePosition(
                 this.carriageMove(carr.begin - 1) + this.isEntered
             );
+            this.isTextSelected = false;
         }
     }
 
@@ -360,16 +360,19 @@
             this.setCarriagePosition(
                 this.carriageMoveDown(carr.begin)
             );
+            this.isTextSelected = false;
             return;
         }
 
         if (!shiftKey && button === 39 && carr.begin <= this.lastSign) {
             this.setCarriagePosition(this.carriageMove(carr.begin, true));
+            this.isTextSelected = false;
             return;
         }
 
         if (!shiftKey && isMoveButton(button)) {
             this.setCarriagePosition(this.lastSign + this.isEntered);
+            this.isTextSelected = false;
         }
     }
 

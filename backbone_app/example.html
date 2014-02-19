@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>New Mask</title>
+        
+        <link rel="stylesheet" href="../examples/example.css">
+        <script type="text/javascript" src="underscore-min.js"></script>
+        <script type="text/javascript" src="../jquery-min.js"></script>        
+        <script type="text/javascript" src="backbone.js"></script>
+        <script type="text/javascript" src="Backbone.ModelBinder.min.js"></script>
+        <script type="text/javascript" src="../mask.js"></script>
+        <script type="text/javascript" src="example.js"></script>
+
+        <script type="text/template" id="mask-template" >
+            <div class="form-group">
+                <label for="phoneOne">
+                    <%= label %> <span class="mask-template"><%= template %></span>:
+                </label>
+                <input tabindex="0" name="value" class="form-control" id="<%= id %>" type="text" placeholder="<%= placeholder %>" />
+            </div>
+        </script>
+    </head> 
+    <body>
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="form-inline" id="app">
+                
+            </div>
+        </div>    
+    </body>
+
+</html>
