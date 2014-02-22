@@ -10,7 +10,9 @@ first argument, and parameteres in second. There are a common approach to start 
 </code>
 </p>
 <h5>For Example:</h5> 
-<code>
-    $('#phone').maskPlugin('(999) 999-9999');
-    $('#date').maskPlugin('99/99/99');
-</code>  
+<pre>    
+    <code>
+        $('#phone').maskPlugin('(999) 999-9999');
+        $('#date').maskPlugin('99/99/99');
+    </code>  
+</pre>
