@@ -1,6 +1,6 @@
 <h2> jQuery Mask Plugin </h2>
 
-<p>Mask Plugin - is a tool which help user to do casual task - entering data. With this plugin you can define such a certain format 
+<p>Mask Plugin - is a tool to help user to do routine task - entering data. With this plugin you can define such a certain format 
 like phone number date or similar with fixed length.</p>
 
 <p>For starting work with mask plugin you simply need invoke 'maskPlugin' on your input selector, and delegate mask string in
