@@ -31,6 +31,7 @@
 
             this.input.remove();
             delete this.input;
+
         }
 
         delete this.maskCreate;
@@ -148,6 +149,8 @@
         equal(this.input.val(), 'a2345 - a7890 - 12345', 
             'clear incomplete works wrong');     
 
+
+        this.input.trigger('blur');
     });
 
     test( "allways mask parametr test", function () {
@@ -201,5 +204,15 @@
 
         delete this.mask
     });
+    
+    test( "reset function test", function () {
+        this.maskCreate();
+
+        this.input.val('a2345a789012345').trigger('input');
+        ok(true);
+
+
+    });
+
 
 } ());

@@ -1,10 +1,13 @@
-Mask Plugin
+Mask Plugin - is a tool which help user to do casual task - entering data. With this plugin you can define such a certain format like phone number date or similar with fixed length.
 
-This is a small project which provide input mask functionality. There are allow you to set up an mask
+There are a common approach to start work with mask plugin.
 
-use :
+$('#input selector').maskPlugin(mask, [parametres]);
 
-$('#input selector').maskPlugin(string maskString, [object parametres]);
+that means, you should only invoke maskPlugin method with your mask string on input selector.
+For Example: 
 
 
+$('#phone').maskPlugin('(999) 999-9999');
+$('#date').maskPlugin('99/99/99');
 

@@ -271,7 +271,13 @@
 
 
     function focusNavigate () {
-        var carr = this.getCarriagePosition();
+        var carr;
+
+        if (!this.$el) { 
+            return;
+        }  
+
+        carr = this.getCarriagePosition();
 
         if (!this.masked) {
             this.writeDown();
