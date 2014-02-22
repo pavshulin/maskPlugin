@@ -14,7 +14,8 @@ that means, you should only invoke maskPlugin method with your mask string on in
 For Example: 
 
 <code>
+
     $('#phone').maskPlugin('(999) 999-9999');
 
     $('#date').maskPlugin('99/99/99');
-<code>  
+</code>  
