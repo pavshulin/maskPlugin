@@ -14,5 +14,6 @@ $('#date').maskPlugin('99/99/99');
 <h4> Pameteres</h4>
 
 <p>By default, mask plugin didn't clear up the input if user leave the field without completed text. For applying that logic you 
-must put 'clearIncomplete' parameter to true in second hash argument
+must put 'clearIncomplete' parameter to true in second hash argument.
 </p>
+<p>'allwaysMask' making input field masked permanently, despite of focus state, starting from initialization of plagin</p>
