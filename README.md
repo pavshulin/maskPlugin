@@ -29,7 +29,7 @@ Parameter <p><code>allwaysMask</code> makes input field masked permanently, desp
 });</code></pre>
 <h5>placeholder:</h5>
 <p>You can also change default placeholder '_'. You should put <code>{placeholder: 'yourPlaceholder'}</code> in mask parameters. Please note, placeholder should contain only one symbol.</p> 
-<p>Example:</p<code>{placeholder: 'yourPlaceholder'}</code>
+<p>Example:</p
 <pre><code>$('#date').maskPlugin('99/99/99', {
 	placeholder: '*'
 });</code></pre>
