@@ -56,4 +56,4 @@ $('#input-date').data('maskPlugin').destroy();</code></pre>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').reset('99\99\99');
 </code></pre>
-<p> In fact, invoking <code>maskPlugin</code> constructor on already masked input is the same as reset function calling.</p>
+<p> In fact, invoking <code>maskPlugin</code> constructor on already masked input is the same as <code>reset</code> function calling.</p>
