@@ -45,7 +45,7 @@ Parameter <p><code>allwaysMask</code> makes input field masked permanently, desp
 <h4>Methods</h4>
 
 <h5>destroy:</h5>
-Method <p><code>destroy</code> will remove mask object, and unbind all mask's listeners from input field. All custom events will not be affected.</p> 
+<p>Method <code>destroy</code> will remove mask object, and unbind all mask's listeners from input field. All custom events will not be affected.</p> 
 <p>Example:</p>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').destroy();</code></pre>
