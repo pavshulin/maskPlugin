@@ -1,7 +1,7 @@
 <h2> jQuery Mask Plug-in </h2>
 
 <p>Mask Plug-in is a tool to help user to do routine task - entering data. With this plug-in you can define such a certain format 
-like phone number date or similar with fixed length.</p>
+like phone number, date or similar with fixed length.</p>
 
 <p>For starting work with mask plug-in you simply need invoke 'maskPlugin' on your input selector, and delegate mask string in
 first argument, and parameteres in second. There are a common approach to start work with mask plug-in:
