@@ -17,3 +17,5 @@ $('#date').maskPlugin('99/99/99');
 must put 'clearIncomplete' parameter to true in second hash argument.
 </p>
 <p>'allwaysMask' making input field masked permanently, despite of focus state, starting from initialization of plagin</p>
+<p>Toy can also change default placeholder '_', just put placeholder: 'yourPlaceholder', in mask parameters. Please note, placeholder should contain only one symbol.</p>
+<p>For defining necessary symbols / characters you may simply add  argument 'unmaskedPosition' to mask parameters.</p>
