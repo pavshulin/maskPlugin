@@ -1,6 +1,6 @@
 <h2> jQuery Mask Plug-in </h2>
 
-<p>Mask Plug-in - is a tool to help user to do routine task - entering data. With this plug-in you can define such a certain format 
+<p>Mask Plug-in is a tool to help user to do routine task - entering data. With this plug-in you can define such a certain format 
 like phone number date or similar with fixed length.</p>
 
 <p>For starting work with mask plug-in you simply need invoke 'maskPlugin' on your input selector, and delegate mask string in
@@ -11,7 +11,7 @@ first argument, and parameteres in second. There are a common approach to start 
 <pre><code>$('#phone').maskPlugin('(999) 999-9999');
 $('#date').maskPlugin('99/99/99');
 </code></pre>
-<h4> Pameteres</h4>
+<h4>Pameteres</h4>
 
 <h5>clearIncomplete:</h5>
 <p>By default, mask plug-in didn't clear up the input if user leave the field without completed text. For applying that logic you 
@@ -42,3 +42,19 @@ Example:</p>
 	clearIncomplete: true,
 	unmaskedPosition: 5
 });</code></pre>
+
+<h4>Methods</h4>
+
+<h5>destroy:</h5>
+<p><code>destroy</code> method will destroy mask, and unbind all mask listeners from input field. All custom events will not affected.
+Example:</p>
+<pre><code>$('#input-date').maskPlugin('99/99/99');
+$('#input-date').data('maskPlugin').destroy();</code></pre>
+
+<h5>reset:</h5>
+<p>For reinitialize exist mask you may simply invoke <code>reset</code> method, and delegate the same mask parameteres. 
+Example:</p>
+<pre><code>$('#input-date').maskPlugin('99/99/99');
+$('#input-date').data('maskPlugin').reset('99\99\99');
+</code></pre>
+<p>In fact, invoking <code>maskPlugin</code> constructor in already masked input, means that <code>reset</code> function will be called.</p>
