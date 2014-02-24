@@ -11,7 +11,7 @@ first argument, and parameteres in second. There are a common approach to start 
 <pre><code>$('#phone').maskPlugin('(999) 999-9999');
 $('#date').maskPlugin('99/99/99');
 </code></pre>
-<h4>Pameteres</h4>
+<h4>Parameters</h4>
 
 <h5>clearIncomplete:</h5>
 <p>By default, mask plug-in didn't clear up the input if user leave the field without completed text. For applying that logic you 
