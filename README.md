@@ -13,9 +13,16 @@ $('#date').maskPlugin('99/99/99');
 </code></pre>
 <h4> Pameteres</h4>
 
+<h5>clearIncomplete</h5>
 <p>By default, mask plugin didn't clear up the input if user leave the field without completed text. For applying that logic you 
-must put 'clearIncomplete' parameter to true in second hash argument.
+must put <code>clearIncomplete</code> parameter to true in second hash argument.
 </p>
-<p>'allwaysMask' making input field masked permanently, despite of focus state, starting from initialization of plagin</p>
-<p>Toy can also change default placeholder '_', just put placeholder: 'yourPlaceholder', in mask parameters. Please note, placeholder should contain only one symbol.</p>
-<p>For defining necessary symbols / characters you may simply add  argument 'unmaskedPosition' to mask parameters.</p>
+
+<h5>allwaysMask</h5>
+<p><code>allwaysMask</code> making input field masked permanently, despite of focus state, starting from initialization of plagin</p>
+
+<h5>placeholder</h5>
+<p>Toy can also change default placeholder '_', just put <code>placeholder: 'yourPlaceholder'</code> in mask parameters. Please note, placeholder should contain only one symbol.</p>
+
+<h5>unmaskedPosition</h5>
+<p>For defining necessary symbols / characters you may simply add  argument <code>unmaskedPosition</code> to mask parameters. Notice, that you also need <code>clearIncomplete</code> parameter here.</p>
