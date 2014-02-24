@@ -46,7 +46,7 @@ Example:</p>
 <h4>Methods</h4>
 
 <h5>destroy:</h5>
-<p><code>destroy</code> method will destroy mask, and unbind all mask listeners from input field. All custom events will not affected.
+<p><code>destroy</code> method will remove mask object, and unbind all mask listeners from input field. All custom events will not be affected.
 Example:</p>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').destroy();</code></pre>
@@ -57,4 +57,4 @@ Example:</p>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').reset('99\99\99');
 </code></pre>
-<p>In fact, invoking <code>maskPlugin</code> constructor in already masked input, means that <code>reset</code> function will be called.</p>
+<p>In fact, invoking <code>maskPlugin</code> constructor on already masked input, means that <code>reset</code> function will be called.</p>
