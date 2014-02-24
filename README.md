@@ -1,7 +1,6 @@
 <h2> jQuery Mask Plug-in </h2>
 
-<p>Mask Plug-in is a tool to help user to do routine task - entering data. With this plug-in you can define such a certain format 
-like phone number, date or similar with fixed length.</p>
+<p>Mask Plug-in is a help tool for entering data. It allows correct entering and exception handling of the next user's data: phone number, date similar with fixed length. Also mask provide functionaliy, which not allow user to reach empty (not entered) part of input.</p>
 
 <p>For starting work with mask plug-in you simply need invoke 'maskPlugin' on your input selector, and delegate mask string in
 first argument, and parameteres in second. There are a common approach to start work with mask plug-in:
@@ -23,20 +22,20 @@ must put <code>{clearIncomplete: true}</code> in second argument.</p>
 
 
 <h5>allwaysMask:</h5>
-<p><code>allwaysMask</code> making input field masked permanently, despite of focus state, starting from initialization of plug-in.</p> 
+Parameter <p><code>allwaysMask</code> makes input field masked permanently, despite of focus state, starting from initialization of plug-in.</p> 
 <p>Example:</p>
 <pre><code>$('#date').maskPlugin('99/99/99', {
 	allwaysMask: true
 });</code></pre>
 <h5>placeholder:</h5>
-<p>Toy can also change default placeholder '_', just put <code>{placeholder: 'yourPlaceholder'}</code> in mask parameters. Please note, placeholder should contain only one symbol.</p> 
-<p>Example:</p>
+<p>You can also change default placeholder '_'. You should put <code>{placeholder: 'yourPlaceholder'}</code> in mask parameters. Please note, placeholder should contain only one symbol.</p> 
+<p>Example:</p<code>{placeholder: 'yourPlaceholder'}</code>
 <pre><code>$('#date').maskPlugin('99/99/99', {
 	placeholder: '*'
 });</code></pre>
 
 <h5>unmaskedPosition:</h5>
-<p>For defining necessary symbols / characters you may simply add  argument <code>unmaskedPosition</code> to mask parameters. Notice, that you also need <code>clearIncomplete</code> parameter here.</p> 
+<p>You may simply add argument <code>unmaskedPosition</code> to mask parameters for defining count of necessary symbols / characters</p> 
 <p>Example:</p>
 <pre><code>$('#zip-code').maskPlugin('99999-9999', {
 	clearIncomplete: true,
@@ -46,15 +45,15 @@ must put <code>{clearIncomplete: true}</code> in second argument.</p>
 <h4>Methods</h4>
 
 <h5>destroy:</h5>
-<p><code>destroy</code> method will remove mask object, and unbind all mask listeners from input field. All custom events will not be affected.</p> 
+Method <p><code>destroy</code> will remove mask object, and unbind all mask's listeners from input field. All custom events will not be affected.</p> 
 <p>Example:</p>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').destroy();</code></pre>
 
 <h5>reset:</h5>
-<p>if you want reinitialize existing mask, you may simply invoke <code>reset</code> method, and delegate them the same mask parameters.</p> 
+<p>If you want to reinitialize existing mask, you can simply invoke <code>reset</code>> method, and delegate to it the same mask parameters.</p> 
 <p>Example:</p>
 <pre><code>$('#input-date').maskPlugin('99/99/99');
 $('#input-date').data('maskPlugin').reset('99\99\99');
 </code></pre>
-<p>In fact, invoking <code>maskPlugin</code> constructor on already masked input, means that <code>reset</code> function will be called.</p>
+<p> In fact, invoking <code>maskPlugin</code> constructor on already masked input is the same as reset function calling.</p>
