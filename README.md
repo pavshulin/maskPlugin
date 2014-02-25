@@ -52,6 +52,10 @@ $('#date').maskPlugin('99/99/99');
 
 <h4>Methods</h4>
 
+<p>After mask plug-in initialization, there are stored a few methods in data attribute ‘maskPlugin’. You can get them by calling:</p>
+<pre><code>$('#input-date').data('maskPlugin');</code></pre>
+<p>Please see the description of methods below:</p>
+
 <h5>destroy:</h5>
 <p>Method <code>destroy</code> removes mask object and unbinds all mask listeners from input field. Custom event listeners will not be affected by calling <code>destroy</code>.</p> 
 <p>Example:</p>   
