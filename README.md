@@ -1,6 +1,6 @@
 <h2> jQuery Mask Plug-in </h2>
 
-<p>Mask Plug-in is a help tool for entering data. It allows correct entering and exception handling of the next user's data: phone number, date similar with fixed length. Also mask provide functionaliy, which not allow user to reach empty (not entered) part of input.</p>
+<p>Mask Plug-in is a help tool for entering data. It allows correct entering and exception handling of the next user's data: phone number, date, data with fixed length.. Also mask provide functionaliy, which not allow user to reach empty (not entered) part of input.</p>
 
 <p>For starting work with mask plug-in you simply need invoke 'maskPlugin' on your input selector, and delegate mask string in
 first argument, and parameteres in second. There are a common approach to start work with mask plug-in:
