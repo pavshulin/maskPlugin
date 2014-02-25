@@ -1,10 +1,17 @@
 <h2> jQuery Mask Plug-in </h2>
 
-<p>Mask Plug-in is a help tool for entering data. It allows correct entering and exception handling of the next user's data: phone number, date, data with fixed length.. Also mask provide functionaliy, which not allow user to reach empty (not entered) part of input.</p>
+<p>Mask Plug-in is a jQuery plug-in for entering data in input field. It allows correct entering and exception handling of the next user's data: phone number, date, data with fixed length.The major advantage of offered mask: it doesn't allow user to reach empty (not entered) part of input.</p>
 
 <p>For starting work with mask plug-in you simply need invoke <code>maskPlugin</code> on your input selector, and delegate mask string in
 first argument, and parameteres in second. There are a common approach to start work with mask plug-in:
-<pre><code>$('#input selector').maskPlugin(mask, [parametres]);</code></pre>
+<pre><code>$('#input selector').maskPlugin(mask, [parametres]);</code></pre>. Each symbols in mask string will be checked with definition object. Existing characters in this object will be treated like regexp rule, and in input will be look like placeholder. Another symbols will be handle like accessory mask patter. By default, mask definitions looks like:
+<code>definitions: {
+    9: '[0-9]',
+    'a': "[A-Za-z]",
+    '*': "[A-Za-z0-9]"
+}</code>
+
+You can simply change this behavior, or assosiate any new symbols with some RegExp patter via changing $.maskPlugin.definitions object like:  <code>$.maskPlugin.definitions object['*']: "[A-Za-z0-9]"</code>
 </p>
 <h5>For Example:</h5> 
 <pre><code>$('#phone').maskPlugin('(999) 999-9999');
