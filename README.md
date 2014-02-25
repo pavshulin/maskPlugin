@@ -5,18 +5,19 @@
 <p>For starting work with mask plug-in you simply need invoke <code>maskPlugin</code> on your input selector, and delegate mask string in
 first argument, and parameteres in second. There are a common approach to start work with mask plug-in:</p>
 <pre><code>$('#input selector').maskPlugin(mask, [parametres]);</code></pre> 
+<h5>For Example:</h5> 
+<pre><code>$('#phone').maskPlugin('(999) 999-9999');
+$('#date').maskPlugin('99/99/99');
+</code></pre>
 <p>Each symbols in mask string will be checked on definition object. Existing characters in this object will be treated like regexp rule, and in input will be looks like placeholder (by default <code>_</code>). Another symbols will be handled like accessory mask pattern. By default, mask definitions looks like:</p>
 <pre><code>definitions: {
     9: '[0-9]',
     'a': "[A-Za-z]",
     '*': "[A-Za-z0-9]"
 }</code></pre>
-<p>You can simply change this behavior, or assosiate any new symbols with some RegExp patter via changing $.maskPlugin.definitions object like:  <code>$.maskPlugin.definitions object['*']: "[A-Za-z0-9]"</code>
-</p>
-<h5>For Example:</h5> 
-<pre><code>$('#phone').maskPlugin('(999) 999-9999');
-$('#date').maskPlugin('99/99/99');
-</code></pre>
+<p>You can simply change this behavior, or assosiate any new symbols with some RegExp pattern via changing $.maskPlugin.definitions object like:</p>  
+<pre><code>$.maskPlugin.definitions object['*'] = "[A-Za-z0-9]"</code></pre>
+
 <h4>Parameters</h4>
 
 <h5>clearIncomplete:</h5>
