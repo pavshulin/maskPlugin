@@ -56,13 +56,6 @@
             initialize: function () {
                 this.template = _.template($('#mask-template').html()); 
                 this._watch = new watcherModel();
-                
-                this._ev = [
-                    'change',
-                    'focus',
-                    'blur',
-                    'input'
-                ];
 
                 // Backbone.ModelBinder.SetOptions({
                 //     modelSetOptions: {
@@ -78,15 +71,7 @@
                     selector;
 
                 this.$el.html(this.template(_model));
-                selector = this.$('#' + _model.id);
-                
-
-                _.each(this._ev, function (ev) {
-                     selector.on(ev, function () {
-                        console.log('trigger ' + ev);
-                     })
-                }, this);    
-
+                selector = this.$('#' + _model.id); 
 
                 this._modelBinder.bind(this._watch, this.$el, maskView.Bindings);
                 selector.maskPlugin(_model.mask, _model.maskOptions)
