@@ -1,4 +1,5 @@
 <h2>jQuery Mask Plug-in</h2>
+<h3>v 1.0</h3>
 
 <p>Mask Plug-in is a jQuery plug-in for entering data in certain format into input text field. It allows controlling correct entering of data and handling the exceptions of the entered data like phone number, date, etc. and data with fixed length.One interesting feature of mask plug-in is a restriction of reaching the unfilled part of an input.</p>
 
