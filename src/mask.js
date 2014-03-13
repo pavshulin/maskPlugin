@@ -3,7 +3,8 @@
             placeholder: "_",
             allwaysMask: false,
             clearIncomplete: false,
-            unmaskedPosition: false
+            unmaskedPosition: false,
+            extensible: false
         },
         moveButtons = [35, 39, 40];
 
@@ -36,18 +37,21 @@
     /* Constructor */
 
     function MaskPlugin (element, mask, options) {
-        var text;
+        var text,
+            _sample;
 
         $.extend(this, getDefaults(), options);
+        
+        _sample = this.extensible ? this : {
+            reset: this._reset.bind(this),
+            destroy: this._destroy.bind(this)
+        };
 
         this.$el = element;
         this.size = mask.length;
         this.cash.maxlength =  this.$el.attr('maxlength');
         this.$el.removeAttr('maxlength');
-        this.$el.data('maskPlugin', {
-            reset: this._reset.bind(this),
-            destroy: this._destroy.bind(this)
-        });
+        this.$el.data('maskPlugin', _sample);
 
         this.maskAnalyse(mask.split(''));
         this.unmaskedPosition = (this.unmaskedPosition - 1) >=

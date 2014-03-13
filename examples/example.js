@@ -12,7 +12,8 @@
             postalCode = $('#postalCode');tinCode
   
         phoneOne.maskPlugin('(999) 9999-999', {
-            placeholder: '_'
+            placeholder: '_',
+            extensible: true
         });
 
         phoneTwo.maskPlugin('(999) 9999-999', {
