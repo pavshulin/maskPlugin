@@ -5,86 +5,111 @@
             clearIncomplete: false,
             unmaskedPosition: false
         },
+        moveButtons = [35, 39, 40];
 
-        defaults = function () {
-            return {
-                actualText: [],
-                charTest: [],
-                placeholders: [],
-                cash: {},
-                buttonCode: false,
-                isEntered: false,
-                isTextSelected: false,
-                masked:false,
-                lastSign: 0,
-                lastSymbol: 0,
-                firstPosition: undefined,
-                firstCarriage: {
-                    begin: 0,
-                    end: 0
-                }
-            };
-        },
+        /* Static functions */
 
-        events = function (_this) {
-            return {
-                _onFocus: _onFocus.bind(_this),
-                _onMouseUp: _onMouseUp.bind(_this),
-                _onMouseDown: _onMouseDown.bind(_this),
-                _onSelect: _onSelect.bind(_this),
-                _onBlur: _onBlur.bind(_this),
-                _onDownButtonHandler: _onDownButtonHandler.bind(_this),
-                _onButtonHandler: _onButtonHandler.bind(_this),
-                _onChange: _onChange.bind(_this),
-                _onComplete: _onComplete.bind(_this),
-                focusNavigate: focusNavigate.bind(_this)
-            };
-        },
-
-        _customMask = function () {
-            return {
-                isMasked: isMasked,
-                isEmptyField: isEmptyField,
-                maskAnalyse: maskAnalyse,
-                middleChange: middleChange,
-                addingText: addingText,
-                removingText: removingText,
-                _resetMask: _resetMask,
-
-                setCarriagePosition: setCarriagePosition,
-                getCarriagePosition: getCarriagePosition,
-                carriageMoveDown: carriageMoveDown,
-                carriageMove: carriageMoveUp,
-
-                writeDown: writeDown,
-                clearUp: clearUp,
-                _clearUpCheck: _clearUpCheck,
-                removeText: removeText,
-                addText: addText,
-                addOne: addOne,
-
-                _reset: _reset,
-                _destroy: _destroy
-            };
-        },
-        moveButtons = [35, 39, 40],
-        isMoveButton = function (button) {
-            return ~ moveButtons.indexOf(button);
+    function getDefaults () {
+        return {
+            actualText: [],
+            charTest: [],
+            placeholders: [],
+            cash: {},
+            buttonCode: false,
+            isEntered: false,
+            isTextSelected: false,
+            masked: false,
+            lastSign: 0,
+            lastSymbol: 0,
+            firstPosition: undefined,
+            firstCarriage: {
+                begin: 0,
+                end: 0
+            }
         };
+    }
+
+    function isMoveButton (button) {
+        return ~ moveButtons.indexOf(button);
+    }
+
+    /* Constructor */
+
+    function MaskPlugin (element, mask, options) {
+        var text;
+
+        $.extend(this, getDefaults(), options);
+
+        this.$el = element;
+        this.size = mask.length;
+        this.cash.maxlength =  this.$el.attr('maxlength');
+        this.$el.removeAttr('maxlength');
+        this.$el.data('maskPlugin', {
+            reset: this._reset.bind(this),
+            destroy: this._destroy.bind(this)
+        });
+
+        this.maskAnalyse(mask.split(''));
+        this.unmaskedPosition = (this.unmaskedPosition - 1) >=
+            this.firstPosition && this.unmaskedPosition - 1;
+
+        $(this.$el)
+            .on('input.maskPlugin', this._onChange.bind(this))
+            .on('focus.maskPlugin', this._onFocus.bind(this))
+            .on('change.maskPlugin', this._onComplete.bind(this))
+            .on('blur.maskPlugin', this._onBlur.bind(this))
+            .on('select.maskPlugin', this._onSelect.bind(this))
+            .on('mouseup.maskPlugin', this._onMouseUp.bind(this))
+            .on('mousedown.maskPlugin', this._onMouseDown.bind(this))
+            .on('keyup.maskPlugin', this._onButtonHandler.bind(this))
+            .on('keydown.maskPlugin', this._onDownButtonHandler.bind(this));
+
+        text = this.$el.val();
+
+        if (text || this.allwaysMask) {
+            this.addText(0, text);
+
+            this.writeDown();
+            this.setCarriagePosition(
+                this.carriageMoveUp(this.lastSign, 1) + this.isEntered
+            );
+        }
+
+        return this;
+    }
+
+    function maskPlugin (mask, options) {
+        var maskObj = $(this).data('maskPlugin');
+        
+        return this.each(function () {
+            if (maskObj) {
+                this.data('maskPlugin').reset(mask, options);
+            }
+            options = $.extend({}, customOptioms, options);
+
+            if (mask && mask.length !== undefined && mask.length > 0 &&
+                options.placeholder && options.placeholder.length === 1) {
+
+                new MaskPlugin($(this), mask, options);
+                $(this).addClass('maskPlugin');
+            }
+        });
+    }
+
 
     /**
      * Utils
      **/
 
-    function isMasked (index) {
+    MaskPlugin.prototype.isMasked = function (index) {
         return !this.charTest[index];
     }
 
-    function isEmptyField (index) {
+    MaskPlugin.prototype.isEmptyField = function (index) {
         return this.actualText[index] === this.placeholders[index];
     }
 
-    function maskAnalyse (mask) {
+    MaskPlugin.prototype.maskAnalyse = function (mask) {
         var maskLength = mask.length,
             i = 0,
             char,
@@ -116,7 +141,7 @@
      * Carriage functions
      */
 
-    function setCarriagePosition (begin, end) {
+    MaskPlugin.prototype.setCarriagePosition = function (begin, end) {
         if (!this.isFocused) {
             return;
         }
@@ -127,14 +152,14 @@
         });
     }
 
-    function getCarriagePosition () {
+    MaskPlugin.prototype.getCarriagePosition = function () {
         return {
             begin: this.$el[0].selectionStart,
             end: this.$el[0].selectionEnd
         };
     }
 
-    function carriageMoveDown (index) {
+    MaskPlugin.prototype.carriageMoveDown = function (index) {
         if (index <= this.firstPosition) {
             return this.firstPosition;
         }
@@ -146,7 +171,7 @@
         return index;
     }
 
-    function carriageMoveUp (index, isMoved) {
+    MaskPlugin.prototype.carriageMoveUp = function (index, isMoved) {
         var moved = 1 - (!!isMoved + 0);
 
         if (index >= this.size) {
@@ -164,26 +189,26 @@
      *  Text creationals function
      */
 
-    function writeDown () {
+    MaskPlugin.prototype.writeDown = function () {
         this.$el.val(this.actualText.join(''));
         this.masked = true;
     }
 
-    function _resetMask () {
+    MaskPlugin.prototype._resetMask = function () {
         this.actualText = this.placeholders.slice();
         this.isEntered = false;
         this._isComplete = false;
         this.lastSign = this.firstPosition;
     }
 
-    function _clearUpCheck () {
+    MaskPlugin.prototype._clearUpCheck = function () {
         if (!this.isEntered || (this.clearIncomplete &&
             !this._isComplete)){
             this.clearUp();
         }
     }
 
-    function clearUp () {
+    MaskPlugin.prototype.clearUp = function () {
         if (!this.allwaysMask) {
             if (this._isAlmostComplete) {
                 this.$el.val(this.actualText.slice(0, this.lastSign + 1).join(''));
@@ -197,12 +222,12 @@
         }
     }
 
-    function removeText (text) {
+    MaskPlugin.prototype.removeText = function (text) {
         this._resetMask();
         this.addText(0, text);
     }
 
-    function addOne (index, char) {
+    MaskPlugin.prototype.addOne = function (index, char) {
         this.actualText[index] = char;
         if (this.lastSign < index) {
             this.lastSign = index;
@@ -211,7 +236,7 @@
     }
 
 
-    function addText (start, text) {
+    MaskPlugin.prototype.addText = function (start, text) {
         var end = text.length,
             n = 0,
             i = start;
@@ -234,13 +259,13 @@
     }
 
 
-    function middleChange (newText, start, buffer) {
+    MaskPlugin.prototype.middleChange = function (newText, start, buffer) {
         this.addText(start, newText.slice(start, newText.length));
 
-        return this.carriageMove(start - 1 + buffer.length) + 1;
+        return this.carriageMoveUp(start - 1 + buffer.length) + 1;
     }
 
-    function removingText (newText, start) {
+    MaskPlugin.prototype.removingText = function (newText, start) {
 
         this.removeText(newText);
 
@@ -253,16 +278,16 @@
         }
 
         if(start < this.lastSign + 1) {
-            return this.carriageMove(start || this.firstPosition) + 1;
+            return this.carriageMoveUp(start || this.firstPosition) + 1;
         }
 
         return this.lastSign + this.isEntered;
     }
 
-    function addingText (newText, start) {
+    MaskPlugin.prototype.addingText = function (newText, start) {
         this.addText(start, newText.slice(start, newText.length));
 
-        return this.carriageMove(this.lastSign) + this.isEntered;
+        return this.carriageMoveUp(this.lastSign) + this.isEntered;
     }
 
     /**
@@ -270,7 +295,7 @@
      **/
 
 
-    function focusNavigate () {
+    MaskPlugin.prototype.focusNavigate = function () {
         var carr;
 
         if (!this.$el) { 
@@ -292,7 +317,7 @@
             carr.begin < this.lastSign) {
 
             this.setCarriagePosition(
-                this.carriageMove(carr.begin - 1) + this.isEntered
+                this.carriageMoveUp(carr.begin - 1) + this.isEntered
             );
             return;
         }
@@ -301,13 +326,13 @@
     }
 
 
-    function _onFocus () {
+    MaskPlugin.prototype._onFocus = function () {
         this.isFocused = true;
         this._firstState = this.$el.val();
-        setTimeout(this.focusNavigate, 0);
+        setTimeout(this.focusNavigate.bind(this), 0);
     }
 
-    function _onBlur () {
+    MaskPlugin.prototype._onBlur = function () {
         this._clearUpCheck();
 
         this.isFocused = false;
@@ -318,42 +343,42 @@
         }
     }
 
-    function _onMouseUp () {
+    MaskPlugin.prototype._onMouseUp = function() {
         var carr = this.getCarriagePosition();
 
         if(carr.begin > this.lastSign ||
             (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
 
             this.setCarriagePosition(
-                this.carriageMove(this.lastSign) + this.isEntered
+                this.carriageMoveUp(this.lastSign) + this.isEntered
             );
             return;
         }
 
         if(carr.begin < this.lastSign && carr.end === carr.begin) {
             this.setCarriagePosition(
-                this.carriageMove(carr.begin - 1) + this.isEntered
+                this.carriageMoveUp(carr.begin - 1) + this.isEntered
             );
             this.isTextSelected = false;
         }
     }
 
-    function _onMouseDown () {
+    MaskPlugin.prototype._onMouseDown = function () {
         this.firstCarriage = this.getCarriagePosition();
     }
 
-    function _onSelect () {
+    MaskPlugin.prototype._onSelect = function () {
         var carr = this.getCarriagePosition();
 
-        if(carr.end > this.carriageMove(this.lastSign) + 1) {
+        if(carr.end > this.carriageMoveUp(this.lastSign) + 1) {
             this.setCarriagePosition(
-                this.carriageMove(this.lastSign) + this.isEntered
+                this.carriageMoveUp(this.lastSign) + this.isEntered
             );
         }
         this.isTextSelected = true;
     }
 
-    function _onDownButtonHandler (event) {
+    MaskPlugin.prototype._onDownButtonHandler = function (event) {
         var carr = this.getCarriagePosition(),
             button = event.which;
 
@@ -361,7 +386,7 @@
         this.buttonCode = button;
     }
 
-    function _onButtonHandler (event) {
+    MaskPlugin.prototype._onButtonHandler = function (event) {
         var button = event.which,
             shiftKey = event.shiftKey,
             carr = this.getCarriagePosition();
@@ -375,7 +400,7 @@
         }
 
         if (!shiftKey && button === 39 && carr.begin <= this.lastSign) {
-            this.setCarriagePosition(this.carriageMove(carr.begin, true));
+            this.setCarriagePosition(this.carriageMoveUp(carr.begin, true));
             this.isTextSelected = false;
             return;
         }
@@ -386,7 +411,7 @@
         }
     }
 
-    function _onComplete () {
+    MaskPlugin.prototype._onComplete = function () {
         var newText = this.$el.val();
 
         if (newText !== this.actualText.join('')) {
@@ -398,7 +423,7 @@
 
     }
 
-    function _onChange () {
+    MaskPlugin.prototype._onChange = function () {
         var carr = this.getCarriagePosition(),
             start = 0,
             newText = this.$el.val().split(''),
@@ -451,7 +476,7 @@
      * Initialize and destroy functions
      */
 
-    function _reset (mask, options) {
+    MaskPlugin.prototype._reset = function (mask, options) {
         var $el = this.$el;
 
         this._destroy();
@@ -459,7 +484,7 @@
         return $el.maskPlugin(mask, options);
     }
 
-    function _destroy () {
+    MaskPlugin.prototype._destroy = function () {
         this.$el.attr('maxlength', this.cash.maxlength);
 
         this.$el.off('.maskPlugin');
@@ -471,67 +496,6 @@
             }
 
         }.bind(this));
-    }
-
-    function MaskPlugin (element, mask, options) {
-        var text;
-
-        $.extend(this, _customMask(), defaults(), events(this), options);
-
-        this.$el = element;
-        this.size = mask.length;
-        this.cash.maxlength =  this.$el.attr('maxlength');
-        this.$el.removeAttr('maxlength');
-        this.$el.data('maskPlugin', {
-            reset: this._reset.bind(this),
-            destroy: this._destroy.bind(this)
-        });
-
-        this.maskAnalyse(mask.split(''));
-        this.unmaskedPosition = (this.unmaskedPosition - 1) >=
-            this.firstPosition && this.unmaskedPosition - 1;
-
-        $(this.$el)
-            .on('input.maskPlugin', this._onChange)
-            .on('focus.maskPlugin', this._onFocus)
-            .on('change.maskPlugin', this._onComplete)
-            .on('blur.maskPlugin', this._onBlur)
-            .on('select.maskPlugin', this._onSelect)
-            .on('mouseup.maskPlugin', this._onMouseUp)
-            .on('mousedown.maskPlugin', this._onMouseDown)
-            .on('keyup.maskPlugin', this._onButtonHandler)
-            .on('keydown.maskPlugin', this._onDownButtonHandler);
-
-        text = this.$el.val();
-
-        if (text || this.allwaysMask) {
-            this.addText(0, text);
-
-            this.writeDown();
-            this.setCarriagePosition(
-                this.carriageMove(this.lastSign, 1) + this.isEntered
-            );
-        }
-
-        return this;
-    }
-
-    function maskPlugin (mask, options) {
-        var maskObj = $(this).data('maskPlugin');
-        
-        return this.each(function () {
-            if (maskObj) {
-                this.data('maskPlugin').reset(mask, options);
-            }
-            options = $.extend({}, customOptioms, options);
-
-            if (mask && mask.length !== undefined && mask.length > 0 &&
-                options.placeholder && options.placeholder.length === 1) {
-
-                new MaskPlugin($(this), mask, options);
-                $(this).addClass('maskPlugin');
-            }
-        });
     }
 
     $.fn.extend({
