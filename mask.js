@@ -103,11 +103,11 @@
 
     MaskPlugin.prototype.isMasked = function (index) {
         return !this.charTest[index];
-    }
+    };
 
     MaskPlugin.prototype.isEmptyField = function (index) {
         return this.actualText[index] === this.placeholders[index];
-    }
+    };
 
     MaskPlugin.prototype.maskAnalyse = function (mask) {
         var maskLength = mask.length,
@@ -135,7 +135,7 @@
         this.firstPosition = this.firstPosition || 0;
 
         this._resetMask();
-    }
+    };
 
     /**
      * Carriage functions
@@ -150,14 +150,14 @@
         this.$el.each(function () {
             this.setSelectionRange(begin, end);
         });
-    }
+    };
 
     MaskPlugin.prototype.getCarriagePosition = function () {
         return {
             begin: this.$el[0].selectionStart,
             end: this.$el[0].selectionEnd
         };
-    }
+    };
 
     MaskPlugin.prototype.carriageMoveDown = function (index) {
         if (index <= this.firstPosition) {
@@ -169,7 +169,7 @@
         }
 
         return index;
-    }
+    };
 
     MaskPlugin.prototype.carriageMoveUp = function (index, isMoved) {
         var moved = 1 - (!!isMoved + 0);
@@ -183,7 +183,7 @@
         }
 
         return index;
-    }
+    };
 
     /**
      *  Text creationals function
@@ -192,21 +192,21 @@
     MaskPlugin.prototype.writeDown = function () {
         this.$el.val(this.actualText.join(''));
         this.masked = true;
-    }
+    };
 
     MaskPlugin.prototype._resetMask = function () {
         this.actualText = this.placeholders.slice();
         this.isEntered = false;
         this._isComplete = false;
         this.lastSign = this.firstPosition;
-    }
+    };
 
     MaskPlugin.prototype._clearUpCheck = function () {
         if (!this.isEntered || (this.clearIncomplete &&
             !this._isComplete)){
             this.clearUp();
         }
-    }
+    };
 
     MaskPlugin.prototype.clearUp = function () {
         if (!this.allwaysMask) {
@@ -220,12 +220,12 @@
             this.$el.val('');
             this.masked = false;
         }
-    }
+    };
 
     MaskPlugin.prototype.removeText = function (text) {
         this._resetMask();
         this.addText(0, text);
-    }
+    };
 
     MaskPlugin.prototype.addOne = function (index, char) {
         this.actualText[index] = char;
@@ -233,8 +233,7 @@
             this.lastSign = index;
         }
         this.isEntered = true;
-    }
-
+    };
 
     MaskPlugin.prototype.addText = function (start, text) {
         var end = text.length,
@@ -256,14 +255,13 @@
         this._isAlmostComplete = (this.unmaskedPosition &&
             this.unmaskedPosition <= this.lastSign);
         this._isComplete = this.lastSign === this.lastSymbol;
-    }
-
+    };
 
     MaskPlugin.prototype.middleChange = function (newText, start, buffer) {
         this.addText(start, newText.slice(start, newText.length));
 
         return this.carriageMoveUp(start - 1 + buffer.length) + 1;
-    }
+    };
 
     MaskPlugin.prototype.removingText = function (newText, start) {
 
@@ -282,18 +280,17 @@
         }
 
         return this.lastSign + this.isEntered;
-    }
+    };
 
     MaskPlugin.prototype.addingText = function (newText, start) {
         this.addText(start, newText.slice(start, newText.length));
 
         return this.carriageMoveUp(this.lastSign) + this.isEntered;
-    }
+    };
 
     /**
      * Event Handlers functions
      **/
-
 
     MaskPlugin.prototype.focusNavigate = function () {
         var carr;
@@ -323,14 +320,13 @@
         }
 
         this.setCarriagePosition(this.lastSign + this.isEntered);
-    }
-
+    };
 
     MaskPlugin.prototype._onFocus = function () {
         this.isFocused = true;
         this._firstState = this.$el.val();
         setTimeout(this.focusNavigate.bind(this), 0);
-    }
+    };
 
     MaskPlugin.prototype._onBlur = function () {
         this._clearUpCheck();
@@ -341,7 +337,7 @@
         if (this._firstState !== this.$el.val()) {
             this.$el.trigger('change');   
         }
-    }
+    };
 
     MaskPlugin.prototype._onMouseUp = function() {
         var carr = this.getCarriagePosition();
@@ -361,11 +357,11 @@
             );
             this.isTextSelected = false;
         }
-    }
+    };
 
     MaskPlugin.prototype._onMouseDown = function () {
         this.firstCarriage = this.getCarriagePosition();
-    }
+    };
 
     MaskPlugin.prototype._onSelect = function () {
         var carr = this.getCarriagePosition();
@@ -376,7 +372,7 @@
             );
         }
         this.isTextSelected = true;
-    }
+    };
 
     MaskPlugin.prototype._onDownButtonHandler = function (event) {
         var carr = this.getCarriagePosition(),
@@ -384,7 +380,7 @@
 
         this.firstCarriage = carr;
         this.buttonCode = button;
-    }
+    };
 
     MaskPlugin.prototype._onButtonHandler = function (event) {
         var button = event.which,
@@ -409,7 +405,7 @@
             this.setCarriagePosition(this.lastSign + this.isEntered);
             this.isTextSelected = false;
         }
-    }
+    };
 
     MaskPlugin.prototype._onComplete = function () {
         var newText = this.$el.val();
@@ -421,7 +417,7 @@
 
         this._clearUpCheck();
 
-    }
+    };
 
     MaskPlugin.prototype._onChange = function () {
         var carr = this.getCarriagePosition(),
@@ -470,7 +466,7 @@
             this.onComplete();
         }
 
-    }
+    };
 
     /**
      * Initialize and destroy functions
@@ -482,7 +478,7 @@
         this._destroy();
 
         return $el.maskPlugin(mask, options);
-    }
+    };
 
     MaskPlugin.prototype._destroy = function () {
         this.$el.attr('maxlength', this.cash.maxlength);
@@ -496,7 +492,7 @@
             }
 
         }.bind(this));
-    }
+    };
 
     $.fn.extend({
         maskPlugin: maskPlugin
