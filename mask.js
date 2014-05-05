@@ -319,7 +319,9 @@
     }
 
     function _onMouseUp () {
-        var carr = this.getCarriagePosition();
+        var carr = this.getCarriagePosition();  
+        
+
 
         if(carr.begin > this.lastSign ||
             (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
@@ -336,6 +338,16 @@
             );
             this.isTextSelected = false;
         }
+
+        // just because on mouse 
+        // down event caret still haven't actual value
+        setTimeout(function () {
+            carr = this.getCarriagePosition();
+
+            if(this.isTextSelected && carr.end === carr.begin){
+                this.isTextSelected = false;
+            }
+        }.bind(this), 0)
     }
 
     function _onMouseDown () {
@@ -406,7 +418,7 @@
             method = 'addingText',
             enteredSymbols,
             position;
-
+        console.log('change')
         if(this.firstCarriage && this.firstCarriage.begin) {
             start = this.firstCarriage.begin;
         }
