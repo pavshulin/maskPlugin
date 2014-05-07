@@ -418,7 +418,7 @@
             method = 'addingText',
             enteredSymbols,
             position;
-        console.log('change')
+
         if(this.firstCarriage && this.firstCarriage.begin) {
             start = this.firstCarriage.begin;
         }
