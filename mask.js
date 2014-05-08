@@ -320,8 +320,16 @@
 
     function _onMouseUp () {
         var carr = this.getCarriagePosition();  
-        
 
+        // just because on mouse 
+        // down event caret still haven't actual value
+        setTimeout(function () {
+            carr = this.getCarriagePosition();
+
+            if(this.isTextSelected && carr.end === carr.begin){
+                this.isTextSelected = false;
+            }
+        }.bind(this), 0);
 
         if(carr.begin > this.lastSign ||
             (carr.end !== carr.begin && carr.end > this.lastSign + 1)) {
@@ -339,15 +347,6 @@
             this.isTextSelected = false;
         }
 
-        // just because on mouse 
-        // down event caret still haven't actual value
-        setTimeout(function () {
-            carr = this.getCarriagePosition();
-
-            if(this.isTextSelected && carr.end === carr.begin){
-                this.isTextSelected = false;
-            }
-        }.bind(this), 0)
     }
 
     function _onMouseDown () {
