@@ -37,6 +37,7 @@
                 _onButtonHandler: _onButtonHandler.bind(_this),
                 _onChange: _onChange.bind(_this),
                 _onComplete: _onComplete.bind(_this),
+                _onValHandler: _onValHandler.bind(_this),
                 focusNavigate: focusNavigate.bind(_this)
             };
         },
@@ -271,13 +272,7 @@
 
 
     function focusNavigate () {
-        var carr;
-
-        if (!this.$el) { 
-            return;
-        }  
-
-        carr = this.getCarriagePosition();
+        var carr = this.getCarriagePosition();
 
         if (!this.masked) {
             this.writeDown();
@@ -314,14 +309,15 @@
         this._onComplete();
 
         if (this._firstState !== this.$el.val()) {
-            this.$el.trigger('change');   
+            this.$el.trigger('change');
         }
     }
-
+    
     function _onMouseUp () {
-        var carr = this.getCarriagePosition();  
+        var carr = this.getCarriagePosition();
 
-        // just because on mouse 
+        // TODO: in next mask version this approach should be different
+        // just because on mouse
         // down event caret still haven't actual value
         setTimeout(function () {
             carr = this.getCarriagePosition();
@@ -397,12 +393,18 @@
         }
     }
 
+    function _onValHandler (event, value) {
+        if (typeof value === "string" && value !== this.$el.val()) {
+            this._onComplete();   
+        }
+    }
+
     function _onComplete () {
         var newText = this.$el.val();
 
         if (newText !== this.actualText.join('')) {
             this.removeText(newText);
-            this.writeDown();    
+            this.writeDown();
         }
 
         this._clearUpCheck();
@@ -455,7 +457,6 @@
         if (this._isComplete && typeof this.onComplete === 'function') {
             this.onComplete();
         }
-
     }
 
     /**
@@ -463,11 +464,7 @@
      */
 
     function _reset (mask, options) {
-        var $el = this.$el;
-
-        this._destroy();
-
-        return $el.maskPlugin(mask, options);
+        this.destroy().maskPlugin(mask, options);
     }
 
     function _destroy () {
@@ -482,6 +479,7 @@
             }
 
         }.bind(this));
+
     }
 
     function MaskPlugin (element, mask, options) {
@@ -506,6 +504,7 @@
             .on('input.maskPlugin', this._onChange)
             .on('focus.maskPlugin', this._onFocus)
             .on('change.maskPlugin', this._onComplete)
+            .on('customMask:change.maskPlugin', this._onValHandler)
             .on('blur.maskPlugin', this._onBlur)
             .on('select.maskPlugin', this._onSelect)
             .on('mouseup.maskPlugin', this._onMouseUp)
@@ -519,20 +518,19 @@
             this.addText(0, text);
 
             this.writeDown();
-            this.setCarriagePosition(
-                this.carriageMove(this.lastSign, 1) + this.isEntered
-            );
+            this._clearUpCheck();
         }
 
         return this;
     }
 
     function maskPlugin (mask, options) {
-        var maskObj = $(this).data('maskPlugin');
-        
+        var _arguments = arguments,
+            maskObj = $(this).data('maskPlugin');
         return this.each(function () {
             if (maskObj) {
-                this.data('maskPlugin').reset(mask, options);
+                maskObj[mask] && maskObj[mask](_arguments);
+                return this;
             }
             options = $.extend({}, customOptioms, options);
 
@@ -556,5 +554,17 @@
             '*': "[A-Za-z0-9]"
         }
     };
+
+    $.fn.val = (function (valFunc) {
+        return function (value) {
+            var result = valFunc.apply(this, arguments);
+
+            if (value) {
+                this.trigger('customMask:change', value);
+            }
+
+            return result;
+        };
+    })($.fn.val);
 
 })(jQuery);

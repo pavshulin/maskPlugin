@@ -32,7 +32,7 @@
             },
 
             validate: function (value) {
-                debugger;
+                console.log('validate', value);
             }
         }),
         maskModel = Backbone.Model.extend({
